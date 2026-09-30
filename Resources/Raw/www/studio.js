@@ -29,6 +29,8 @@ const I18N = {
     "action.copy": "Chép",
     "action.showControls": "Hiện bảng điều khiển",
     "action.delete": "Xóa",
+    "action.cancel": "Hủy",
+    "confirm.title": "Xác nhận",
     "action.up": "Lên",
     "action.down": "Xuống",
     "stage.region": "Vùng phát",
@@ -156,7 +158,9 @@ const I18N = {
     "settings.likes": "Tim trên luồng",
     "settings.likesOn": "Hiện tim khi có lượt thích",
     "settings.randomHearts": "Random tim",
-    "settings.randomHeartsHint": "Lúc khoảng 10 tim/giây, lúc khoảng 50, rồi nghỉ một nhịp. Chỉ là hiệu ứng trên hình.",
+    "settings.randomHeartsHint": "Chỉ là hiệu ứng trên hình.",
+    "settings.heartRate": "Số lượng tim",
+    "settings.heartRateHint": "Random tim bay đúng số này mỗi giây, rồi nghỉ một nhịp. Lượt thích thật không hiện nhiều hơn số này.",
     "layout.left": "Trái %",
     "layout.bottom": "Đáy %",
     "layout.top": "Trên %",
@@ -244,6 +248,8 @@ const I18N = {
     "action.copy": "Copy",
     "action.showControls": "Show controls",
     "action.delete": "Delete",
+    "action.cancel": "Cancel",
+    "confirm.title": "Please confirm",
     "action.up": "Up",
     "action.down": "Down",
     "stage.region": "Playback",
@@ -371,7 +377,9 @@ const I18N = {
     "settings.likes": "Hearts on stream",
     "settings.likesOn": "Show hearts for likes",
     "settings.randomHearts": "Random hearts",
-    "settings.randomHeartsHint": "Sometimes about 10 hearts a second, sometimes about 50, then a pause. Visual only.",
+    "settings.randomHeartsHint": "Visual only.",
+    "settings.heartRate": "Heart count",
+    "settings.heartRateHint": "Random hearts use this many each second, then pause. Real likes never show more than this.",
     "layout.left": "Left %",
     "layout.bottom": "Bottom %",
     "layout.top": "Top %",
@@ -446,6 +454,7 @@ let showComments = true;
 let showViewers = true;
 let showLikes = true;
 let randomHearts = false;
+let heartRate = 20;
 const widgetLayout = {
   comment: { x: 4, y: 4, width: 78, height: 46, scale: 100 },
   viewer: { x: 4, y: 3.2, scale: 100 }
@@ -453,6 +462,12 @@ const widgetLayout = {
 let viewerCount = null;
 let roomStatusKey = "room.idle";
 let roomHasKey = false;
+
+function clampHeartRate(value) {
+  const n = Math.round(Number(value));
+  if (!Number.isFinite(n)) return 20;
+  return Math.max(1, Math.min(80, n));
+}
 
 function t(key, vars) {
   const pack = I18N[lang] || I18N.vi;
@@ -475,6 +490,7 @@ function loadLocalPrefs() {
     if (typeof saved?.showViewers === "boolean") showViewers = saved.showViewers;
     if (typeof saved?.showLikes === "boolean") showLikes = saved.showLikes;
     if (typeof saved?.randomHearts === "boolean") randomHearts = saved.randomHearts;
+    if (saved?.heartRate != null) heartRate = clampHeartRate(saved.heartRate);
     if (saved?.commentLayout) widgetLayout.comment = normalizeCommentLayout(saved.commentLayout);
     if (saved?.viewerLayout) widgetLayout.viewer = normalizeViewerLayout(saved.viewerLayout);
   } catch {
@@ -483,7 +499,7 @@ function loadLocalPrefs() {
 
 function saveLocalPrefs() {
   localStorage.setItem("livescript.prefs", JSON.stringify({
-    theme, lang, ratio, showComments, showViewers, showLikes, randomHearts,
+    theme, lang, ratio, showComments, showViewers, showLikes, randomHearts, heartRate,
     commentLayout: widgetLayout.comment,
     viewerLayout: widgetLayout.viewer
   }));
@@ -521,6 +537,11 @@ function applyLang() {
   document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
     if (el.id === "roomKey" && roomHasKey) el.placeholder = t("room.keySaved");
     else el.placeholder = t(el.dataset.i18nPlaceholder);
+  });
+  document.querySelectorAll("[data-i18n-tip]").forEach((el) => {
+    const label = t(el.dataset.i18nTip);
+    el.dataset.tip = label;
+    el.setAttribute("aria-label", label);
   });
   setTab(document.body.dataset.tab || "stage");
   setPlayUi();
@@ -630,7 +651,7 @@ function saveLayoutPrefs() {
   saveLocalPrefs();
   if (!outputMode) post({
     type: "savePrefs",
-    theme, lang, ratio, showComments, showViewers, showLikes, randomHearts,
+    theme, lang, ratio, showComments, showViewers, showLikes, randomHearts, heartRate,
     commentLayout: widgetLayout.comment,
     viewerLayout: widgetLayout.viewer
   });
@@ -770,20 +791,22 @@ function spawnHearts(count, spreadMs) {
     if (layer.childElementCount >= 100) break;
     const heart = document.createElement("span");
     heart.className = "like-heart";
-    const drift = Math.round(-30 - Math.random() * 150);
-    const sway = Math.round(drift * (0.25 + Math.random() * 0.45) + (Math.random() - 0.5) * 36);
     heart.style.color = heartColors[Math.floor(Math.random() * heartColors.length)];
     heart.style.fontSize = `${Math.round(base * (0.55 + Math.random() * 0.7))}px`;
-    heart.style.right = `${9 + Math.random() * 7}%`;
-    heart.style.bottom = `${11 + Math.random() * 6}%`;
+    heart.style.right = `${8 + Math.random() * 10}%`;
+    heart.style.bottom = `${10 + Math.random() * 8}%`;
     heart.style.animationDelay = `${Math.round(Math.random() * windowMs)}ms`;
-    heart.style.animationDuration = `${2.1 + Math.random() * 1.5}s`;
-    heart.style.setProperty("--dx", `${drift}px`);
-    heart.style.setProperty("--sway", `${sway}px`);
-    heart.style.setProperty("--rot", `${Math.round((Math.random() - 0.5) * 50)}deg`);
-    heart.style.setProperty("--rise", `-${Math.round(rise * (0.5 + Math.random() * 0.5))}px`);
-    heart.innerHTML = `<i class="fa-solid fa-heart" aria-hidden="true"></i>`;
-    heart.addEventListener("animationend", () => heart.remove());
+    heart.style.animationDuration = `${2.8 + Math.random() * 1.1}s`;
+    heart.style.setProperty("--amp", `${Math.round(16 + Math.random() * 34)}px`);
+    heart.style.setProperty("--sway-dur", `${(0.85 + Math.random() * 0.7).toFixed(2)}s`);
+    heart.style.setProperty("--sway-delay", `-${Math.random().toFixed(2)}s`);
+    heart.style.setProperty("--rot", `${Math.round(8 + Math.random() * 18)}deg`);
+    heart.style.setProperty("--rise", `-${Math.round(rise * (0.62 + Math.random() * 0.34))}px`);
+    heart.innerHTML = `<span class="like-heart-sway"><i class="fa-solid fa-heart" aria-hidden="true"></i></span>`;
+    heart.addEventListener("animationend", (event) => {
+      if (event.target !== heart || event.animationName !== "heart-rise") return;
+      heart.remove();
+    });
     layer.appendChild(heart);
   }
 }
@@ -798,7 +821,7 @@ function onLikes(message) {
   const random = !!message.random;
   const count = random
     ? Math.max(1, Math.min(80, Math.round(Number(message.count) || 1)))
-    : Math.max(1, Math.min(8, Math.round(Number(message.count) || 1)));
+    : Math.max(1, Math.min(clampHeartRate(heartRate), Math.round(Number(message.count) || 1)));
   const spreadMs = random ? Math.max(400, Math.min(2000, Math.round(Number(message.spreadMs) || 1000))) : 0;
   likeBursts.push({ id, count, spreadMs, random, at: Date.now() });
   if (likeBursts.length > 40) likeBursts.shift();
@@ -823,7 +846,7 @@ let heartTimer = 0;
 
 function scheduleRandomHearts() {
   if (!heartLoop) return;
-  const rate = 10 + Math.floor(Math.random() * 41);
+  const rate = clampHeartRate(heartRate);
   const windowMs = 700 + Math.round(Math.random() * 800);
   const count = Math.max(1, Math.min(80, Math.round(rate * windowMs / 1000)));
   onLikes({
@@ -893,6 +916,8 @@ function applyFrame() {
   if (viewers) viewers.checked = showViewers;
   const likes = document.getElementById("showLikes");
   if (likes) likes.checked = showLikes;
+  const rate = document.getElementById("heartRate");
+  if (rate && document.activeElement !== rate) rate.value = String(heartRate);
   if (!showLikes && !randomHearts) clearHearts();
   syncHeartMode();
   syncLayoutInputs();
@@ -911,13 +936,14 @@ function setPreference(next) {
   if (typeof next.showViewers === "boolean") showViewers = next.showViewers;
   if (typeof next.showLikes === "boolean") showLikes = next.showLikes;
   if (typeof next.randomHearts === "boolean") randomHearts = next.randomHearts;
+  if (next.heartRate != null) heartRate = clampHeartRate(next.heartRate);
   saveLocalPrefs();
   applyTheme();
   applyLang();
   if (state.ready) renderAll();
   if (!outputMode) post({
     type: "savePrefs",
-    theme, lang, ratio, showComments, showViewers, showLikes, randomHearts,
+    theme, lang, ratio, showComments, showViewers, showLikes, randomHearts, heartRate,
     commentLayout: widgetLayout.comment,
     viewerLayout: widgetLayout.viewer
   });
@@ -932,6 +958,7 @@ function adoptHostPrefs(prefs) {
   const nextViewers = typeof prefs.showViewers === "boolean" ? prefs.showViewers : showViewers;
   const nextLikes = typeof prefs.showLikes === "boolean" ? prefs.showLikes : showLikes;
   const nextRandom = typeof prefs.randomHearts === "boolean" ? prefs.randomHearts : randomHearts;
+  const nextRate = prefs.heartRate != null ? clampHeartRate(prefs.heartRate) : heartRate;
   const nextComment = prefs.commentLayout ? normalizeCommentLayout(prefs.commentLayout) : widgetLayout.comment;
   const nextViewer = prefs.viewerLayout ? normalizeViewerLayout(prefs.viewerLayout) : widgetLayout.viewer;
   theme = nextTheme;
@@ -941,6 +968,7 @@ function adoptHostPrefs(prefs) {
   showViewers = nextViewers;
   showLikes = nextLikes;
   randomHearts = nextRandom;
+  heartRate = nextRate;
   widgetLayout.comment = nextComment;
   widgetLayout.viewer = nextViewer;
   saveLocalPrefs();
@@ -1138,12 +1166,44 @@ function persistNow() {
   post({ type: "saveScript", script, activeScriptId: script.id });
 }
 
-function toast(message) {
+function toast(message, icon = "info") {
+  if (!message) return;
+  if (window.Swal) {
+    Swal.fire({
+      toast: true,
+      position: "bottom",
+      icon,
+      title: message,
+      showConfirmButton: false,
+      timer: 3400,
+      timerProgressBar: true,
+      heightAuto: false
+    });
+    return;
+  }
   const el = document.getElementById("toast");
   el.textContent = message;
   el.hidden = false;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { el.hidden = true; }, 3400);
+}
+
+async function askConfirm(message) {
+  if (!window.Swal) return confirm(message);
+  const result = await Swal.fire({
+    title: t("confirm.title"),
+    text: message,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: t("action.delete"),
+    cancelButtonText: t("action.cancel"),
+    reverseButtons: true,
+    focusCancel: true,
+    heightAuto: false,
+    confirmButtonColor: "#e11d48",
+    cancelButtonColor: "#3c4352"
+  });
+  return !!result.isConfirmed;
 }
 
 function onHost(raw) {
@@ -1165,14 +1225,14 @@ function onHost(raw) {
     renderSceneList();
     renderInspector();
     renderTriggers();
-    if (message.notice) toast(message.notice);
+    if (message.notice) toast(message.notice, "success");
   } else if (message.type === "status") {
     toast(message.message || "");
   } else if (message.type === "error") {
-    toast(translateStatus(message.message) || t("toast.error"));
+    toast(translateStatus(message.message) || t("toast.error"), "error");
   } else if (message.type === "room") {
     setRoomUi(message.state || "idle", message.message || "");
-    if (message.state === "error") toast(translateStatus(message.message) || t("room.unreachable"));
+    if (message.state === "error") toast(translateStatus(message.message) || t("room.unreachable"), "error");
   } else if (message.type === "liveEvent") {
     onLiveEvent(message);
   } else if (message.type === "viewers") {
@@ -1308,8 +1368,8 @@ function renderSceneList() {
           <span class="meta">${esc(sceneMeta(scene, script.mode))}</span>
         </button>
         <div class="scene-ops">
-          <button type="button" data-action="scene-up" data-id="${esc(scene.id)}" title="${esc(t("action.up"))}"><i class="fa-solid fa-chevron-up" aria-hidden="true"></i></button>
-          <button type="button" data-action="scene-down" data-id="${esc(scene.id)}" title="${esc(t("action.down"))}"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>
+          <button type="button" class="icon-btn" data-action="scene-up" data-id="${esc(scene.id)}" data-tip="${esc(t("action.up"))}" aria-label="${esc(t("action.up"))}"><i class="fa-solid fa-chevron-up" aria-hidden="true"></i></button>
+          <button type="button" class="icon-btn" data-action="scene-down" data-id="${esc(scene.id)}" data-tip="${esc(t("action.down"))}" aria-label="${esc(t("action.down"))}"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>
         </div>
       </article>`).join("")
     : `<p class="empty">${esc(t("script.noScene"))}</p>`;
@@ -1602,19 +1662,22 @@ function showPlaceholder(show) {
 function setMuteUi() {
   const button = document.getElementById("btnMute");
   const muted = player.muted;
+  const label = muted ? t("mute.on") : t("mute.off");
   button.classList.toggle("is-muted", muted);
-  button.title = muted ? t("mute.on") : t("mute.off");
-  button.setAttribute("aria-label", button.title);
-  button.querySelector(".icon-on").hidden = muted;
-  button.querySelector(".icon-off").hidden = !muted;
+  button.dataset.tip = label;
+  button.setAttribute("aria-label", label);
+  const icon = button.querySelector("i");
+  if (icon) icon.className = muted ? "fa-solid fa-volume-xmark" : "fa-solid fa-volume-high";
 }
 
 function setPlayUi() {
   const playing = state.playing || triggerPlaying;
   const label = playing ? t("action.stop") : t("action.play");
-  document.querySelectorAll("#btnPlay span, #btnPlay2 span").forEach((el) => { el.textContent = label; });
-  document.querySelectorAll("#btnPlay i, #btnPlay2 i").forEach((el) => {
-    el.className = playing ? "fa-solid fa-stop" : "fa-solid fa-play";
+  document.querySelectorAll("#btnPlay, #btnPlay2").forEach((el) => {
+    el.dataset.tip = label;
+    el.setAttribute("aria-label", label);
+    const icon = el.querySelector("i");
+    if (icon) icon.className = playing ? "fa-solid fa-stop" : "fa-solid fa-play";
   });
   document.querySelector(".stage-frame")?.classList.toggle("is-playing", playing);
 }
@@ -1719,10 +1782,10 @@ function addScript() {
   renderAll();
 }
 
-function deleteCurrentScript() {
+async function deleteCurrentScript() {
   const script = currentScript();
   if (!script) return;
-  if (!confirm(t("script.confirmDelete", { name: script.name }))) return;
+  if (!await askConfirm(t("script.confirmDelete", { name: script.name }))) return;
   const id = script.id;
   state.scripts = state.scripts.filter((item) => item.id !== id);
   state.activeScriptId = state.scripts[0]?.id ?? null;
@@ -1754,7 +1817,7 @@ function addAllVideos() {
   const script = currentScript();
   if (!script) return;
   if (!state.videos.length) {
-    toast(t("toast.noVideo"));
+    toast(t("toast.noVideo"), "warning");
     return;
   }
   state.videos.forEach((video) => {
@@ -1782,11 +1845,11 @@ function moveScene(id, delta) {
   persistSoon();
 }
 
-function deleteSelectedScene() {
+async function deleteSelectedScene() {
   const script = currentScript();
   const scene = selectedScene();
   if (!script || !scene) return;
-  if (!confirm(t("scene.confirmDelete", { name: scene.title }))) return;
+  if (!await askConfirm(t("scene.confirmDelete", { name: scene.title }))) return;
   script.scenes = script.scenes.filter((item) => item.id !== scene.id);
   if (state.selectedOverlayKey?.includes(scene.id)) state.selectedOverlayKey = null;
   state.selectedSceneId = script.scenes[0]?.id ?? null;
@@ -1824,7 +1887,7 @@ function addOverlay(scope) {
   } else {
     const scene = selectedScene();
     if (!scene) {
-      toast(t("toast.pickScene"));
+      toast(t("toast.pickScene"), "warning");
       return;
     }
     scene.overlays.push(overlay);
@@ -1850,7 +1913,7 @@ function insertToken(token) {
   const area = document.getElementById("overlayText");
   const overlay = selectedOverlay();
   if (!area || !overlay) {
-    toast(t("toast.pickText"));
+    toast(t("toast.pickText"), "warning");
     return;
   }
   const start = area.selectionStart ?? area.value.length;
@@ -1868,7 +1931,7 @@ function takeMark(which) {
   const scene = selectedScene();
   if (!scene) return;
   if (!scene.videoFile || player.dataset.file !== scene.videoFile) {
-    toast(t("toast.markFirst"));
+    toast(t("toast.markFirst"), "warning");
     return;
   }
   const mark = Math.round((player.currentTime || 0) * 10) / 10;
@@ -1951,14 +2014,14 @@ async function previewVideo(index) {
     player.pause();
     updateTimecode();
   } catch {
-    toast(t("toast.openFail"));
+    toast(t("toast.openFail"), "error");
   }
 }
 
-function deleteVideo(index) {
+async function deleteVideo(index) {
   const video = state.videos[index];
   if (!video) return;
-  if (!confirm(t("library.confirmDelete", { name: video.displayName }))) return;
+  if (!await askConfirm(t("library.confirmDelete", { name: video.displayName }))) return;
   if (player.dataset.file === video.fileName) {
     player.removeAttribute("src");
     player.dataset.file = "";
@@ -1988,7 +2051,7 @@ async function previewScene(scene) {
     player.pause();
     updateTimecode();
   } catch {
-    toast(t("toast.sceneVideoFail"));
+    toast(t("toast.sceneVideoFail"), "error");
   }
 }
 
@@ -2001,14 +2064,14 @@ function nextIndex(script, index) {
 async function playFrom(index, hops = 0, ticket = epoch) {
   const script = currentScript();
   if (!script?.scenes.length) {
-    toast(t("toast.needScene"));
+    toast(t("toast.needScene"), "warning");
     stopPlayback();
     return;
   }
   if (ticket !== epoch) return;
   if (hops > script.scenes.length) {
     stopPlayback();
-    toast(t("toast.nonePlayable"));
+    toast(t("toast.nonePlayable"), "warning");
     return;
   }
   if (index >= script.scenes.length) {
@@ -2054,7 +2117,7 @@ async function playFrom(index, hops = 0, ticket = epoch) {
   } catch {
     if (ticket === epoch) {
       stopPlayback();
-      toast(t("toast.playFail"));
+      toast(t("toast.playFail"), "error");
     }
   } finally {
     if (ticket === epoch) state.switching = false;
@@ -2338,7 +2401,7 @@ function toggleRoom() {
   }
   const user = document.getElementById("roomUser").value.trim().replace(/^@/, "");
   if (!user) {
-    toast(t("room.needuser"));
+    toast(t("room.needuser"), "warning");
     setTab("interact");
     document.getElementById("roomUser").focus();
     return;
@@ -2373,9 +2436,10 @@ function setRoomUi(mode, message) {
   if (message) roomStatusKey = message;
   const button = document.getElementById("btnRoom");
   if (button) {
-    const label = button.querySelector("span");
+    const label = roomMode === "idle" ? t("room.listen") : t("room.stop");
     const icon = button.querySelector("i");
-    if (label) label.textContent = roomMode === "idle" ? t("room.listen") : t("room.stop");
+    button.dataset.tip = label;
+    button.setAttribute("aria-label", label);
     if (icon) icon.className = roomMode === "idle" ? "fa-solid fa-headphones" : "fa-solid fa-stop";
     button.classList.toggle("is-live", roomMode === "live");
     button.disabled = roomMode === "connecting";
@@ -2483,7 +2547,7 @@ function mockHost(message) {
       });
       renderLibrary();
       renderInspector();
-      toast(t("library.added", { n: input.files.length }));
+      toast(t("library.added", { n: input.files.length }), "success");
     };
     input.click();
   } else if (message.type === "deleteVideo") {
@@ -2906,7 +2970,68 @@ function bindPaneResize() {
   applyPaneLayout();
 }
 
+function bindHoverTips() {
+  const tip = document.getElementById("hoverTip");
+  if (!tip) return;
+  let current = null;
+
+  const hide = () => {
+    tip.hidden = true;
+    current = null;
+  };
+
+  const labelShown = (el) => {
+    const span = el.querySelector(":scope > span");
+    if (!span) return false;
+    return getComputedStyle(span).display !== "none";
+  };
+
+  const place = (el) => {
+    const text = el?.dataset?.tip;
+    if (!text || outputMode || labelShown(el)) {
+      hide();
+      return;
+    }
+    current = el;
+    tip.textContent = text;
+    tip.hidden = false;
+    const rect = el.getBoundingClientRect();
+    const margin = 8;
+    const width = tip.offsetWidth;
+    const height = tip.offsetHeight;
+    const sidebar = el.closest(".sidebar");
+    const rail = sidebar && getComputedStyle(sidebar).flexDirection === "column";
+    let left = rail ? rect.right + margin : rect.left + rect.width / 2 - width / 2;
+    let top = rail ? rect.top + rect.height / 2 - height / 2 : rect.bottom + margin;
+    if (!rail && top + height > window.innerHeight - 8)
+      top = rect.top - height - margin;
+    if (left + width > window.innerWidth - 8)
+      left = window.innerWidth - width - 8;
+    tip.style.left = `${Math.max(8, left)}px`;
+    tip.style.top = `${Math.max(8, top)}px`;
+  };
+
+  document.addEventListener("pointerover", (event) => {
+    const el = event.target.closest?.("[data-tip]");
+    if (el) place(el);
+  });
+  document.addEventListener("pointerout", (event) => {
+    if (!current) return;
+    if (event.relatedTarget && current.contains(event.relatedTarget)) return;
+    hide();
+  });
+  document.addEventListener("focusin", (event) => {
+    const el = event.target.closest?.("[data-tip]");
+    if (el) place(el);
+  });
+  document.addEventListener("focusout", hide);
+  document.addEventListener("pointerdown", hide);
+  window.addEventListener("scroll", hide, true);
+  window.addEventListener("resize", hide);
+}
+
 function bindStatic() {
+  bindHoverTips();
   const pick = () => post({ type: "pickVideos" });
   document.getElementById("btnAdd").addEventListener("click", pick);
   document.getElementById("btnAddSide").addEventListener("click", pick);
@@ -2955,6 +3080,15 @@ function bindStatic() {
   document.getElementById("randomHearts").addEventListener("change", (event) => {
     setPreference({ randomHearts: event.target.checked });
   });
+  document.getElementById("heartRate").addEventListener("input", (event) => {
+    if (String(event.target.value).trim() === "") return;
+    setPreference({ heartRate: clampHeartRate(event.target.value) });
+  });
+  document.getElementById("heartRate").addEventListener("change", (event) => {
+    const n = clampHeartRate(event.target.value);
+    event.target.value = String(n);
+    setPreference({ heartRate: n });
+  });
   document.getElementById("btnCopyLink").addEventListener("click", async () => {
     const input = document.getElementById("outputLink");
     const value = input.value.trim();
@@ -2966,7 +3100,7 @@ function bindStatic() {
       input.select();
       document.execCommand("copy");
     }
-    toast(t("toast.copied"));
+    toast(t("toast.copied"), "success");
   });
   ["roomUser", "roomKey"].forEach((id) => {
     document.getElementById(id).addEventListener("change", () => {

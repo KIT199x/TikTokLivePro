@@ -17,7 +17,7 @@ public sealed class StudioStore
 		".mp4", ".webm", ".mov", ".m4v", ".mkv"
 	};
 
-	static readonly string[] WebFiles = ["index.html", "studio.css", "studio.js", "fontawesome.min.css", "fa-solid-900.woff2"];
+	static readonly string[] WebFiles = ["index.html", "studio.css", "studio.js", "sweetalert2.all.min.js", "fontawesome.min.css", "fa-solid-900.woff2"];
 
 	public string HostDirectory { get; }
 	public string MediaDirectory { get; }
@@ -37,6 +37,7 @@ public sealed class StudioStore
 	public bool ShowViewers { get; private set; } = true;
 	public bool ShowLikes { get; private set; } = true;
 	public bool RandomHearts { get; private set; }
+	public int HeartRate { get; private set; } = 20;
 	public WidgetLayout CommentLayout { get; private set; } = WidgetLayout.Comment();
 	public WidgetLayout ViewerLayout { get; private set; } = WidgetLayout.Viewer();
 
@@ -200,7 +201,7 @@ public sealed class StudioStore
 		WriteSettings();
 	}
 
-	public void SavePrefs(string? theme, string? language, string? ratio, bool? showComments, bool? showViewers, bool? showLikes, WidgetLayout? commentLayout, WidgetLayout? viewerLayout, bool? randomHearts = null)
+	public void SavePrefs(string? theme, string? language, string? ratio, bool? showComments, bool? showViewers, bool? showLikes, WidgetLayout? commentLayout, WidgetLayout? viewerLayout, bool? randomHearts = null, int? heartRate = null)
 	{
 		if (theme is "light" or "dark")
 			Theme = theme;
@@ -216,6 +217,8 @@ public sealed class StudioStore
 			ShowLikes = likes;
 		if (randomHearts is bool hearts)
 			RandomHearts = hearts;
+		if (heartRate is int rate)
+			HeartRate = Math.Clamp(rate, 1, 80);
 		if (commentLayout is not null)
 			CommentLayout = WidgetLayout.NormalizeComment(commentLayout);
 		if (viewerLayout is not null)
@@ -235,6 +238,7 @@ public sealed class StudioStore
 			ShowViewers = ShowViewers,
 			ShowLikes = ShowLikes,
 			RandomHearts = RandomHearts,
+			HeartRate = HeartRate,
 			CommentLayout = CommentLayout,
 			ViewerLayout = ViewerLayout
 		}, JsonOpts);
@@ -301,6 +305,8 @@ public sealed class StudioStore
 				ShowLikes = likes;
 			if (settings?.RandomHearts is bool hearts)
 				RandomHearts = hearts;
+			if (settings?.HeartRate is int rate && rate > 0)
+				HeartRate = Math.Clamp(rate, 1, 80);
 			if (settings?.CommentLayout is not null)
 				CommentLayout = WidgetLayout.NormalizeComment(settings.CommentLayout);
 			if (settings?.ViewerLayout is not null)
@@ -492,6 +498,7 @@ public sealed class StudioStore
 		public bool? ShowViewers { get; set; }
 		public bool? ShowLikes { get; set; }
 		public bool? RandomHearts { get; set; }
+		public int? HeartRate { get; set; }
 		public WidgetLayout? CommentLayout { get; set; }
 		public WidgetLayout? ViewerLayout { get; set; }
 	}

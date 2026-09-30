@@ -409,7 +409,15 @@ public partial class MainPage : ContentPage
 			(randomElement.ValueKind is JsonValueKind.True or JsonValueKind.False)
 			? randomElement.GetBoolean()
 			: null;
-		_store.SavePrefs(theme, language, ratio, showComments, showViewers, showLikes, ReadWidget(root, "commentLayout"), ReadWidget(root, "viewerLayout"), randomHearts);
+		int? heartRate = null;
+		if (root.TryGetProperty("heartRate", out var rateElement))
+		{
+			if (rateElement.TryGetInt32(out var rate))
+				heartRate = rate;
+			else if (rateElement.TryGetDouble(out var rateNumber))
+				heartRate = (int)Math.Round(rateNumber);
+		}
+		_store.SavePrefs(theme, language, ratio, showComments, showViewers, showLikes, ReadWidget(root, "commentLayout"), ReadWidget(root, "viewerLayout"), randomHearts, heartRate);
 	}
 
 	void PostState()
@@ -445,6 +453,7 @@ public partial class MainPage : ContentPage
 				showViewers = _store.ShowViewers,
 				showLikes = _store.ShowLikes,
 				randomHearts = _store.RandomHearts,
+				heartRate = _store.HeartRate,
 				commentLayout = _store.CommentLayout,
 				viewerLayout = _store.ViewerLayout
 			}

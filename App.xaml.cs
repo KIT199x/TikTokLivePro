@@ -14,8 +14,8 @@ public partial class App : Application
 			Title = "TikTok Live Pro",
 			Width = 1360,
 			Height = 900,
-			MinimumWidth = 1100,
-			MinimumHeight = 720
+			MinimumWidth = 980,
+			MinimumHeight = 680
 		};
 	}
 }

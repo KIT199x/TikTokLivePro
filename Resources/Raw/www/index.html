@@ -16,7 +16,7 @@
     } catch (e) {}
   </script>
     <link rel="stylesheet" href="fontawesome.min.css" />
-    <link rel="stylesheet" href="studio.css?v=29" />
+    <link rel="stylesheet" href="studio.css?v=33" />
 </head>
 <body data-tab="stage">
   <aside class="sidebar">
@@ -28,32 +28,32 @@
       </div>
     </div>
     <nav id="viewTabs" aria-label="Menu điều khiển">
-      <button type="button" data-tab="stage" class="is-on" aria-current="page">
+      <button type="button" data-tab="stage" class="is-on" aria-current="page" data-i18n-tip="nav.stage">
         <i class="fa-solid fa-clapperboard" aria-hidden="true"></i>
         <span data-i18n="nav.stage">Sân khấu</span>
       </button>
-      <button type="button" data-tab="library">
+      <button type="button" data-tab="library" data-i18n-tip="nav.library">
         <i class="fa-solid fa-photo-film" aria-hidden="true"></i>
         <span data-i18n="nav.library">Thư viện</span>
       </button>
-      <button type="button" data-tab="script">
+      <button type="button" data-tab="script" data-i18n-tip="nav.script">
         <i class="fa-solid fa-scroll" aria-hidden="true"></i>
         <span data-i18n="nav.script">Kịch bản</span>
       </button>
-      <button type="button" data-tab="interact">
+      <button type="button" data-tab="interact" data-i18n-tip="nav.interact">
         <i class="fa-solid fa-comments" aria-hidden="true"></i>
         <span data-i18n="nav.interact">Tương tác</span>
         <em id="navQueue" class="nav-badge" hidden>0</em>
       </button>
-      <button type="button" data-tab="stream">
+      <button type="button" data-tab="stream" data-i18n-tip="nav.stream">
         <i class="fa-solid fa-tower-broadcast" aria-hidden="true"></i>
         <span data-i18n="nav.stream">Luồng</span>
       </button>
-      <button type="button" data-tab="settings">
+      <button type="button" data-tab="settings" data-i18n-tip="nav.settings">
         <i class="fa-solid fa-gear" aria-hidden="true"></i>
         <span data-i18n="nav.settings">Cài đặt</span>
       </button>
-      <button type="button" data-tab="about">
+      <button type="button" data-tab="about" data-i18n-tip="nav.about">
         <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
         <span data-i18n="nav.about">Giới thiệu</span>
       </button>
@@ -64,9 +64,9 @@
     <header class="topbar">
       <h1 id="pageTitle">Sân khấu</h1>
       <div class="header-actions">
-        <button id="btnAdd" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i><span data-i18n="action.addVideo">Thêm video</span></button>
-        <button id="btnNewScript" type="button"><i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i><span data-i18n="action.newScript">Kịch bản mới</span></button>
-        <button id="btnPlay" class="primary" type="button"><i class="fa-solid fa-play" aria-hidden="true"></i><span data-i18n="action.play">Phát</span></button>
+        <button id="btnAdd" class="icon-btn" type="button" data-i18n-tip="action.addVideo"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
+        <button id="btnNewScript" class="icon-btn" type="button" data-i18n-tip="action.newScript"><i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i></button>
+        <button id="btnPlay" class="primary icon-btn" type="button" data-i18n-tip="action.play"><i class="fa-solid fa-play" aria-hidden="true"></i></button>
       </div>
     </header>
     <main>
@@ -94,14 +94,13 @@
         </div>
         <div class="transport" id="transport">
           <div class="transport-group">
-            <button id="btnPrev" type="button"><i class="fa-solid fa-backward-step" aria-hidden="true"></i><span data-i18n="action.prev">Trước</span></button>
-            <button id="btnPlay2" class="primary" type="button"><i class="fa-solid fa-play" aria-hidden="true"></i><span data-i18n="action.play">Phát</span></button>
-            <button id="btnNext" type="button"><i class="fa-solid fa-forward-step" aria-hidden="true"></i><span data-i18n="action.next">Sau</span></button>
+            <button id="btnPrev" class="icon-btn" type="button" data-i18n-tip="action.prev"><i class="fa-solid fa-backward-step" aria-hidden="true"></i></button>
+            <button id="btnPlay2" class="primary icon-btn" type="button" data-i18n-tip="action.play"><i class="fa-solid fa-play" aria-hidden="true"></i></button>
+            <button id="btnNext" class="icon-btn" type="button" data-i18n-tip="action.next"><i class="fa-solid fa-forward-step" aria-hidden="true"></i></button>
           </div>
           <span id="timecode">0:00 / 0:00</span>
-          <button id="btnMute" class="icon-btn" type="button" aria-label="Tắt tiếng" title="Tắt tiếng">
-            <i class="fa-solid fa-volume-high icon-on" aria-hidden="true"></i>
-            <i class="fa-solid fa-volume-xmark icon-off" aria-hidden="true" hidden></i>
+          <button id="btnMute" class="icon-btn" type="button" aria-label="Tắt tiếng">
+            <i class="fa-solid fa-volume-high" aria-hidden="true"></i>
           </button>
         </div>
         <div id="stageResize" class="stage-resize" role="separator" tabindex="0">
@@ -115,7 +114,7 @@
       <aside class="panel library">
         <div class="panel-head">
           <h2 class="panel-title" data-i18n="library.title">Thư viện video</h2>
-          <button id="btnAddSide" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i><span data-i18n="action.add">Thêm</span></button>
+          <button id="btnAddSide" class="icon-btn" type="button" data-i18n-tip="action.add"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
         </div>
         <ul id="videoList">
           <li class="empty">Đang tải…</li>
@@ -141,12 +140,12 @@
             <label class="field"><span data-i18n="room.key">Signing key</span>
               <input id="roomKey" type="password" data-i18n-placeholder="room.keyPlaceholder" placeholder="Chỉ cần nếu không vào được phòng" autocomplete="off" spellcheck="false" />
             </label>
-            <button id="btnRoom" type="button"><i class="fa-solid fa-headphones" aria-hidden="true"></i><span data-i18n="room.listen">Nghe live</span></button>
+            <button id="btnRoom" class="icon-btn" type="button" data-i18n-tip="room.listen"><i class="fa-solid fa-headphones" aria-hidden="true"></i></button>
             <p id="roomStatus" class="muted" data-i18n="room.idle">Chưa nghe phòng live.</p>
             <p id="viewerReadout" class="muted" hidden></p>
             <ul id="eventLog" class="event-log"></ul>
             <div id="triggerHost"></div>
-            <button type="button" data-action="add-trigger"><i class="fa-solid fa-plus" aria-hidden="true"></i><span data-i18n="trigger.add">Thêm luật phát</span></button>
+            <button type="button" class="icon-btn" data-action="add-trigger" data-i18n-tip="trigger.add"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
             <p class="muted" data-i18n="room.hint">Comment có từ khóa, hoặc quà trùng tên, sẽ phát video đã chọn. Người mới vào phòng được đọc tên và cảm ơn bằng tiếng nói.</p>
           </section>
         </section>
@@ -156,7 +155,7 @@
             <p class="muted" data-i18n="stream.help">LIVE Studio không nhận địa chỉ 127.0.0.1. Dán link dưới đây, bật Độ phân giải tùy chỉnh, nhập W 1080 và H 1920, rồi giữ Bật âm thanh.</p>
             <div class="link-row">
               <input id="outputLink" readonly data-i18n-placeholder="stream.opening" placeholder="Đang mở cổng…" />
-              <button id="btnCopyLink" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i><span data-i18n="action.copy">Chép</span></button>
+              <button id="btnCopyLink" class="icon-btn" type="button" data-i18n-tip="action.copy"><i class="fa-solid fa-copy" aria-hidden="true"></i></button>
             </div>
             <p id="outputLinkStatus" class="muted" data-i18n="stream.openingStatus">Đang mở cổng phát…</p>
           </section>
@@ -205,7 +204,13 @@
             <input id="randomHearts" type="checkbox" />
             <span data-i18n="settings.randomHearts">Random tim</span>
           </label>
-          <p class="muted" data-i18n="settings.randomHeartsHint">Lúc khoảng 10 tim/giây, lúc khoảng 50, rồi nghỉ một nhịp. Chỉ là hiệu ứng trên hình.</p>
+          <div class="grid2">
+            <label class="field">
+              <span data-i18n="settings.heartRate">Số lượng tim</span>
+              <input id="heartRate" type="number" min="1" max="80" step="1" value="20" />
+            </label>
+          </div>
+          <p class="muted" data-i18n="settings.heartRateHint">Random tim bay đúng số này mỗi giây, rồi nghỉ một nhịp. Lượt thích thật không hiện nhiều hơn số này.</p>
         </fieldset>
         <fieldset class="wide">
           <legend data-i18n="settings.comments">Comment trên luồng</legend>
@@ -306,6 +311,8 @@
   </div>
   <button id="btnExitCapture" class="exit-capture" type="button" data-i18n="action.showControls">Hiện bảng điều khiển</button>
   <div id="toast" class="toast" hidden></div>
-  <script src="studio.js?v=29"></script>
+  <div id="hoverTip" class="hover-tip" role="tooltip" hidden></div>
+  <script src="sweetalert2.all.min.js"></script>
+  <script src="studio.js?v=34"></script>
 </body>
 </html>

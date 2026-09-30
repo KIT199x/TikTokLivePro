@@ -89,8 +89,8 @@ static class StageWindow
 			_appWindow.MoveAndResize(_saved);
 		if (_maui is not null)
 		{
-			_maui.MinimumWidth = _minWidth > 0 ? _minWidth : 1100;
-			_maui.MinimumHeight = _minHeight > 0 ? _minHeight : 720;
+			_maui.MinimumWidth = _minWidth > 0 ? _minWidth : 980;
+			_maui.MinimumHeight = _minHeight > 0 ? _minHeight : 680;
 		}
 		_staging = false;
 	}
