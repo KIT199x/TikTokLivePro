@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TikTokLivePro.MainPage"
+             BackgroundColor="#100E0C"
+             NavigationPage.HasNavigationBar="False">
+    <Grid>
+        <WebView x:Name="StudioView" BackgroundColor="#100E0C" />
+        <Label x:Name="ErrorLabel"
+               IsVisible="False"
+               TextColor="#F6F1EA"
+               Margin="28"
+               FontSize="16"
+               LineBreakMode="WordWrap"
+               VerticalOptions="Center"
+               HorizontalOptions="Center" />
+    </Grid>
+</ContentPage>

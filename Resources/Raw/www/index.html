@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TikTok Live Pro</title>
+  <script>
+    try {
+      var prefs = JSON.parse(localStorage.getItem("livescript.prefs") || "null");
+      if (prefs && (prefs.theme === "light" || prefs.theme === "dark"))
+        document.documentElement.dataset.theme = prefs.theme;
+      if (prefs && (prefs.lang === "en" || prefs.lang === "vi"))
+        document.documentElement.lang = prefs.lang;
+      if (prefs && (prefs.ratio === "9:16" || prefs.ratio === "16:9" || prefs.ratio === "1:1"))
+        document.documentElement.dataset.ratio = prefs.ratio;
+    } catch (e) {}
+  </script>
+    <link rel="stylesheet" href="fontawesome.min.css" />
+    <link rel="stylesheet" href="studio.css?v=29" />
+</head>
+<body data-tab="stage">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"><i class="fa-solid fa-clapperboard"></i></span>
+      <div>
+        <strong>Live Pro</strong>
+        <small class="brand-sub" data-i18n="brand.sub">Bảng điều khiển</small>
+      </div>
+    </div>
+    <nav id="viewTabs" aria-label="Menu điều khiển">
+      <button type="button" data-tab="stage" class="is-on" aria-current="page">
+        <i class="fa-solid fa-clapperboard" aria-hidden="true"></i>
+        <span data-i18n="nav.stage">Sân khấu</span>
+      </button>
+      <button type="button" data-tab="library">
+        <i class="fa-solid fa-photo-film" aria-hidden="true"></i>
+        <span data-i18n="nav.library">Thư viện</span>
+      </button>
+      <button type="button" data-tab="script">
+        <i class="fa-solid fa-scroll" aria-hidden="true"></i>
+        <span data-i18n="nav.script">Kịch bản</span>
+      </button>
+      <button type="button" data-tab="interact">
+        <i class="fa-solid fa-comments" aria-hidden="true"></i>
+        <span data-i18n="nav.interact">Tương tác</span>
+        <em id="navQueue" class="nav-badge" hidden>0</em>
+      </button>
+      <button type="button" data-tab="stream">
+        <i class="fa-solid fa-tower-broadcast" aria-hidden="true"></i>
+        <span data-i18n="nav.stream">Luồng</span>
+      </button>
+      <button type="button" data-tab="settings">
+        <i class="fa-solid fa-gear" aria-hidden="true"></i>
+        <span data-i18n="nav.settings">Cài đặt</span>
+      </button>
+      <button type="button" data-tab="about">
+        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+        <span data-i18n="nav.about">Giới thiệu</span>
+      </button>
+    </nav>
+    <p class="side-note" data-i18n="hint.keys">Space phát · ← → cảnh</p>
+  </aside>
+  <div class="shell">
+    <header class="topbar">
+      <h1 id="pageTitle">Sân khấu</h1>
+      <div class="header-actions">
+        <button id="btnAdd" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i><span data-i18n="action.addVideo">Thêm video</span></button>
+        <button id="btnNewScript" type="button"><i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i><span data-i18n="action.newScript">Kịch bản mới</span></button>
+        <button id="btnPlay" class="primary" type="button"><i class="fa-solid fa-play" aria-hidden="true"></i><span data-i18n="action.play">Phát</span></button>
+      </div>
+    </header>
+    <main>
+      <section class="stage-col">
+        <div class="stage-caption">
+          <span data-i18n="stage.region">Vùng phát</span>
+          <span id="ratioLabel">9:16</span>
+        </div>
+        <div class="stage-frame">
+          <div id="stage" class="stage">
+            <video id="player" playsinline></video>
+            <div id="placeholder">
+              <strong data-i18n="stage.emptyTitle">Sân khấu trống</strong>
+              <p data-i18n="stage.emptyBody">Thêm video, gắn vào từng cảnh, rồi phát liên tiếp hoặc theo mốc vào/ra.</p>
+            </div>
+            <div id="liveBadge" class="live-badge" hidden><i></i>LIVE</div>
+            <div id="viewerBadge" class="viewer-badge" hidden>
+              <i class="fa-solid fa-eye" aria-hidden="true"></i>
+              <span>0</span>
+            </div>
+            <div id="overlayLayer"></div>
+            <div id="commentFeed" class="comment-feed" hidden></div>
+            <div id="likeLayer" class="like-layer"></div>
+          </div>
+        </div>
+        <div class="transport" id="transport">
+          <div class="transport-group">
+            <button id="btnPrev" type="button"><i class="fa-solid fa-backward-step" aria-hidden="true"></i><span data-i18n="action.prev">Trước</span></button>
+            <button id="btnPlay2" class="primary" type="button"><i class="fa-solid fa-play" aria-hidden="true"></i><span data-i18n="action.play">Phát</span></button>
+            <button id="btnNext" type="button"><i class="fa-solid fa-forward-step" aria-hidden="true"></i><span data-i18n="action.next">Sau</span></button>
+          </div>
+          <span id="timecode">0:00 / 0:00</span>
+          <button id="btnMute" class="icon-btn" type="button" aria-label="Tắt tiếng" title="Tắt tiếng">
+            <i class="fa-solid fa-volume-high icon-on" aria-hidden="true"></i>
+            <i class="fa-solid fa-volume-xmark icon-off" aria-hidden="true" hidden></i>
+          </button>
+        </div>
+        <div id="stageResize" class="stage-resize" role="separator" tabindex="0">
+          <i class="fa-solid fa-up-right-and-down-left-from-center" aria-hidden="true"></i>
+        </div>
+      </section>
+      <div class="side-col" id="sideCol">
+        <div id="paneSplit" class="pane-split" role="separator" aria-orientation="vertical" tabindex="0">
+          <i class="fa-solid fa-grip-vertical" aria-hidden="true"></i>
+        </div>
+      <aside class="panel library">
+        <div class="panel-head">
+          <h2 class="panel-title" data-i18n="library.title">Thư viện video</h2>
+          <button id="btnAddSide" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i><span data-i18n="action.add">Thêm</span></button>
+        </div>
+        <ul id="videoList">
+          <li class="empty">Đang tải…</li>
+        </ul>
+        <p class="foot" data-i18n="library.foot">MP4 H.264 phát ổn định nhất. Link luồng nằm ở menu Luồng.</p>
+      </aside>
+      <aside class="panel editor" id="editor">
+        <section data-view="script">
+          <div id="scriptBar"></div>
+          <div id="sceneList"></div>
+          <div id="inspector"></div>
+        </section>
+        <section data-view="interact">
+          <section class="live-box" id="queueBox">
+            <h3><span data-i18n="queue.title">Hàng chờ</span> <span id="queueCount">0</span></h3>
+            <ol id="queueList" class="queue-list"><li class="muted">Không có video đang chờ.</li></ol>
+          </section>
+          <section class="live-box" id="interactBox">
+            <h3 data-i18n="room.title">Tương tác người xem</h3>
+            <label class="field"><span data-i18n="room.user">Tài khoản TikTok đang live</span>
+              <input id="roomUser" data-i18n-placeholder="room.userPlaceholder" placeholder="ten_tai_khoan" autocomplete="off" spellcheck="false" />
+            </label>
+            <label class="field"><span data-i18n="room.key">Signing key</span>
+              <input id="roomKey" type="password" data-i18n-placeholder="room.keyPlaceholder" placeholder="Chỉ cần nếu không vào được phòng" autocomplete="off" spellcheck="false" />
+            </label>
+            <button id="btnRoom" type="button"><i class="fa-solid fa-headphones" aria-hidden="true"></i><span data-i18n="room.listen">Nghe live</span></button>
+            <p id="roomStatus" class="muted" data-i18n="room.idle">Chưa nghe phòng live.</p>
+            <p id="viewerReadout" class="muted" hidden></p>
+            <ul id="eventLog" class="event-log"></ul>
+            <div id="triggerHost"></div>
+            <button type="button" data-action="add-trigger"><i class="fa-solid fa-plus" aria-hidden="true"></i><span data-i18n="trigger.add">Thêm luật phát</span></button>
+            <p class="muted" data-i18n="room.hint">Comment có từ khóa, hoặc quà trùng tên, sẽ phát video đã chọn. Người mới vào phòng được đọc tên và cảm ơn bằng tiếng nói.</p>
+          </section>
+        </section>
+        <section data-view="stream">
+          <section class="live-box" id="linkBox">
+            <h3 data-i18n="stream.title">Luồng cho LIVE Studio</h3>
+            <p class="muted" data-i18n="stream.help">LIVE Studio không nhận địa chỉ 127.0.0.1. Dán link dưới đây, bật Độ phân giải tùy chỉnh, nhập W 1080 và H 1920, rồi giữ Bật âm thanh.</p>
+            <div class="link-row">
+              <input id="outputLink" readonly data-i18n-placeholder="stream.opening" placeholder="Đang mở cổng…" />
+              <button id="btnCopyLink" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i><span data-i18n="action.copy">Chép</span></button>
+            </div>
+            <p id="outputLinkStatus" class="muted" data-i18n="stream.openingStatus">Đang mở cổng phát…</p>
+          </section>
+        </section>
+      </aside>
+      <aside class="panel settings" id="settingsPanel">
+        <h2 data-i18n="settings.title">Cá nhân hóa</h2>
+        <fieldset>
+          <legend data-i18n="settings.theme">Nền</legend>
+          <div class="segment" id="themeSwitch">
+            <button type="button" data-theme-value="dark" data-i18n="settings.dark">Tối</button>
+            <button type="button" data-theme-value="light" data-i18n="settings.light">Sáng</button>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend data-i18n="settings.lang">Ngôn ngữ</legend>
+          <div class="segment" id="langSwitch">
+            <button type="button" data-lang-value="vi">Tiếng Việt</button>
+            <button type="button" data-lang-value="en">English</button>
+          </div>
+        </fieldset>
+        <fieldset class="wide">
+          <legend data-i18n="settings.playback">Phát kịch bản</legend>
+          <div id="playbackSettings"></div>
+        </fieldset>
+        <fieldset class="wide">
+          <legend data-i18n="overlay.shared">Chữ chung</legend>
+          <div id="sharedText"></div>
+        </fieldset>
+        <fieldset class="wide">
+          <legend data-i18n="settings.ratio">Tỷ lệ khung</legend>
+          <div class="segment" id="ratioSwitch">
+            <button type="button" data-ratio-value="9:16">9:16</button>
+            <button type="button" data-ratio-value="16:9">16:9</button>
+            <button type="button" data-ratio-value="1:1">1:1</button>
+          </div>
+          <p class="muted" id="ratioSize">1080 × 1920</p>
+        </fieldset>
+        <fieldset class="wide">
+          <legend data-i18n="settings.likes">Tim trên luồng</legend>
+          <label class="checks">
+            <input id="showLikes" type="checkbox" checked />
+            <span data-i18n="settings.likesOn">Hiện tim khi có lượt thích</span>
+          </label>
+          <label class="checks">
+            <input id="randomHearts" type="checkbox" />
+            <span data-i18n="settings.randomHearts">Random tim</span>
+          </label>
+          <p class="muted" data-i18n="settings.randomHeartsHint">Lúc khoảng 10 tim/giây, lúc khoảng 50, rồi nghỉ một nhịp. Chỉ là hiệu ứng trên hình.</p>
+        </fieldset>
+        <fieldset class="wide">
+          <legend data-i18n="settings.comments">Comment trên luồng</legend>
+          <label class="checks">
+            <input id="showComments" type="checkbox" checked />
+            <span data-i18n="settings.commentsOn">Hiện comment</span>
+          </label>
+          <div class="grid2">
+            <label class="field"><span data-i18n="layout.left">Trái %</span><input id="commentX" type="number" min="0" max="90" step="0.5" value="4" /></label>
+            <label class="field"><span data-i18n="layout.bottom">Đáy %</span><input id="commentY" type="number" min="0" max="80" step="0.5" value="4" /></label>
+            <label class="field"><span data-i18n="layout.width">Rộng %</span><input id="commentW" type="number" min="18" max="100" step="1" value="78" /></label>
+            <label class="field"><span data-i18n="layout.height">Cao %</span><input id="commentH" type="number" min="12" max="80" step="1" value="46" /></label>
+            <label class="field span2"><span data-i18n="layout.scale">Cỡ chữ %</span><input id="commentScale" type="number" min="40" max="250" step="5" value="100" /></label>
+          </div>
+          <p class="muted" data-i18n="layout.hint">Kéo khung trên sân khấu để đặt vị trí. Số này áp lên luồng stream.</p>
+        </fieldset>
+        <fieldset class="wide">
+          <legend data-i18n="settings.viewers">Mắt xem trên luồng</legend>
+          <label class="checks">
+            <input id="showViewers" type="checkbox" checked />
+            <span data-i18n="settings.viewersOn">Hiện mắt xem</span>
+          </label>
+          <div class="grid2">
+            <label class="field"><span data-i18n="layout.left">Trái %</span><input id="viewerX" type="number" min="0" max="90" step="0.5" value="4" /></label>
+            <label class="field"><span data-i18n="layout.top">Trên %</span><input id="viewerY" type="number" min="0" max="90" step="0.5" value="3.2" /></label>
+            <label class="field"><span data-i18n="layout.scale">Cỡ chữ %</span><input id="viewerScale" type="number" min="40" max="250" step="5" value="100" /></label>
+          </div>
+          <p class="muted" data-i18n="layout.hintViewer">Kéo số mắt xem trên sân khấu để đặt vị trí.</p>
+        </fieldset>
+        <p class="muted" data-i18n="settings.hint">Lựa chọn được lưu trên máy này. Lời cảm ơn người vào phòng và thứ trong ngày cũng đổi theo ngôn ngữ.</p>
+      </aside>
+      </div>
+      <article class="about" id="aboutPage">
+        <header class="about-hero">
+          <span class="mark" aria-hidden="true"><i class="fa-solid fa-clapperboard"></i></span>
+          <div>
+            <p class="about-kicker" data-i18n="about.kicker">TikTok Live Pro</p>
+            <h2 data-i18n="about.title">Sân khấu cho phiên live của bạn</h2>
+            <p data-i18n="about.lead">Dựng kịch bản video trên máy, phủ ngày giờ và tương tác từ phòng live của bạn, rồi đưa khung hình sang TikTok LIVE Studio.</p>
+          </div>
+        </header>
+        <ol class="about-steps">
+          <li>
+            <strong data-i18n="about.step1Title">Dựng kịch bản</strong>
+            <span data-i18n="about.step1">Thêm video, xếp cảnh, rồi phát liên tiếp hoặc theo mốc vào và ra.</span>
+          </li>
+          <li>
+            <strong data-i18n="about.step2Title">Gắn tương tác</strong>
+            <span data-i18n="about.step2">Nghe phòng live. Comment đúng từ khóa hoặc quà trùng tên sẽ phát video đã chọn.</span>
+          </li>
+          <li>
+            <strong data-i18n="about.step3Title">Phát trên Studio</strong>
+            <span data-i18n="about.step3">Dán link luồng vào LIVE Studio, chọn đúng khổ khung và giữ bật âm thanh.</span>
+          </li>
+        </ol>
+        <div class="about-grid">
+          <section class="about-card">
+            <i class="fa-solid fa-scroll" aria-hidden="true"></i>
+            <h3 data-i18n="about.scriptTitle">Kịch bản</h3>
+            <p data-i18n="about.scriptBody">Phát hết video hoặc chỉ một đoạn. Lặp lại, đổi thứ tự cảnh và xem cảnh đang phát được đánh dấu.</p>
+          </section>
+          <section class="about-card">
+            <i class="fa-solid fa-font" aria-hidden="true"></i>
+            <h3 data-i18n="about.textTitle">Chữ trên hình</h3>
+            <p data-i18n="about.textBody">Gắn dòng chữ riêng cho từng cảnh hoặc dùng chung. Ngày, giờ và thứ cập nhật theo thời gian thực.</p>
+          </section>
+          <section class="about-card">
+            <i class="fa-solid fa-comments" aria-hidden="true"></i>
+            <h3 data-i18n="about.roomTitle">Phòng live của bạn</h3>
+            <p data-i18n="about.roomBody">Đọc comment, quà, người mới vào, lượt thích và số người đang xem từ phòng live công khai của chính bạn.</p>
+          </section>
+          <section class="about-card">
+            <i class="fa-solid fa-film" aria-hidden="true"></i>
+            <h3 data-i18n="about.triggerTitle">Phát theo tương tác</h3>
+            <p data-i18n="about.triggerBody">Một comment chứa từ khóa, hoặc một quà trùng tên, sẽ chen video đã chọn rồi quay lại kịch bản.</p>
+          </section>
+          <section class="about-card">
+            <i class="fa-solid fa-volume-high" aria-hidden="true"></i>
+            <h3 data-i18n="about.speechTitle">Lời cảm ơn</h3>
+            <p data-i18n="about.speechBody">Khi có người vào phòng, ứng dụng đọc tên và nói lời cảm ơn đã tham gia phiên live.</p>
+          </section>
+          <section class="about-card">
+            <i class="fa-solid fa-heart" aria-hidden="true"></i>
+            <h3 data-i18n="about.overlayTitle">Lớp trên luồng</h3>
+            <p data-i18n="about.overlayBody">Hiện comment, số mắt xem và tim bay. Kéo để đặt vị trí, rồi chọn khung 9:16, 16:9 hoặc 1:1.</p>
+          </section>
+        </div>
+        <section class="about-note">
+          <i class="fa-solid fa-tower-broadcast" aria-hidden="true"></i>
+          <div>
+            <h3 data-i18n="about.studioTitle">Link cho LIVE Studio</h3>
+            <p data-i18n="about.studioBody">Menu Luồng có địa chỉ để thêm nguồn liên kết. Bật độ phân giải tùy chỉnh đúng khổ đã chọn: 1080×1920, 1920×1080 hoặc 1080×1080.</p>
+          </div>
+        </section>
+        <p class="about-fine" data-i18n="about.fine">Ứng dụng chỉ đọc phòng live công khai của bạn để hiện tương tác thật. Không đăng nhập hộ và không tạo comment hay mắt xem giả.</p>
+      </article>
+    </main>
+  </div>
+  <button id="btnExitCapture" class="exit-capture" type="button" data-i18n="action.showControls">Hiện bảng điều khiển</button>
+  <div id="toast" class="toast" hidden></div>
+  <script src="studio.js?v=29"></script>
+</body>
+</html>
