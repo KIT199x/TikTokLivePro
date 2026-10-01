@@ -13,18 +13,92 @@
         document.documentElement.lang = prefs.lang;
       if (prefs && (prefs.ratio === "9:16" || prefs.ratio === "16:9" || prefs.ratio === "1:1"))
         document.documentElement.dataset.ratio = prefs.ratio;
+      if (location.search.indexOf("output=1") < 0)
+        document.documentElement.classList.add("needs-license");
     } catch (e) {}
   </script>
     <link rel="stylesheet" href="fontawesome.min.css" />
-    <link rel="stylesheet" href="studio.css?v=33" />
+    <link rel="stylesheet" href="select2.min.css" />
+    <link rel="stylesheet" href="studio.css?v=56" />
 </head>
 <body data-tab="stage">
+  <section id="licenseGate" class="license-gate" aria-label="Bản quyền">
+    <div class="license-card">
+      <p class="about-kicker">TikTok Live Pro</p>
+      <h1 id="licenseTitle">Chọn gói</h1>
+      <div class="license-key-row">
+        <span>Key</span>
+        <strong id="licenseKeyValue">Đang tạo key…</strong>
+        <button id="licenseCopy" type="button">Sao chép</button>
+      </div>
+      <p id="licenseMessage" class="muted">Key của máy này được lưu một lần và chưa kích hoạt.</p>
+      <div id="licensePlans" class="license-plans"></div>
+      <button id="licenseSubmit" class="primary" type="button">Dùng gói này</button>
+      <div id="licensePay" class="license-pay" hidden>
+        <div class="pay-qr">
+          <img id="licenseQr" alt="Mã VietQR" />
+          <span>Quét bằng app ngân hàng</span>
+        </div>
+        <div class="pay-sheet">
+          <div class="pay-amount">
+            <span>Số tiền</span>
+            <strong id="licensePayAmount"></strong>
+          </div>
+          <dl class="pay-rows">
+            <div>
+              <dt>Ngân hàng</dt>
+              <dd id="licensePayBank"></dd>
+            </div>
+            <div>
+              <dt>Số tài khoản</dt>
+              <dd id="licensePayAccount"></dd>
+              <button type="button" data-copy="account">Sao chép</button>
+            </div>
+            <div>
+              <dt>Chủ tài khoản</dt>
+              <dd id="licensePayName"></dd>
+            </div>
+            <div class="is-ref">
+              <dt>Nội dung chuyển khoản</dt>
+              <dd id="licensePayRef"></dd>
+              <button type="button" data-copy="ref">Sao chép</button>
+            </div>
+          </dl>
+          <p class="pay-wait"><span class="pay-dot" aria-hidden="true"></span> Đang chờ tiền vào. Giữ nguyên nội dung chuyển khoản.</p>
+          <button id="licenseBack" type="button">Chọn gói khác</button>
+        </div>
+      </div>
+      <div id="licenseExpired" class="license-expired" hidden>
+        <div class="expire-hero">
+          <span class="expire-mark" aria-hidden="true"></span>
+          <div>
+            <strong>Thời hạn đã kết thúc</strong>
+            <p>Trình phát đã dừng. Chọn gói bên dưới để gia hạn key này.</p>
+          </div>
+        </div>
+        <div class="expire-plans">
+          <button type="button" class="expire-plan" data-plan="pro">
+            <span>Pro</span>
+            <strong>390.000đ</strong>
+            <small>30 ngày</small>
+          </button>
+          <button type="button" class="expire-plan is-vip" data-plan="vip">
+            <span>VIP</span>
+            <strong>490.000đ</strong>
+            <small>30 ngày · giao diện riêng</small>
+          </button>
+        </div>
+        <p id="expireStatus" class="expire-status" hidden></p>
+      </div>
+      <p id="licenseStatus" class="muted"></p>
+    </div>
+  </section>
   <aside class="sidebar">
     <div class="brand">
       <span class="mark" aria-hidden="true"><i class="fa-solid fa-clapperboard"></i></span>
       <div>
-        <strong>Live Pro</strong>
-        <small class="brand-sub" data-i18n="brand.sub">Bảng điều khiển</small>
+        <strong>TikTok Live</strong>
+        <small class="brand-sub" id="brandPlan"></small>
       </div>
     </div>
     <nav id="viewTabs" aria-label="Menu điều khiển">
@@ -64,6 +138,7 @@
     <header class="topbar">
       <h1 id="pageTitle">Sân khấu</h1>
       <div class="header-actions">
+        <div id="licenseDock" class="license-dock" hidden></div>
         <button id="btnAdd" class="icon-btn" type="button" data-i18n-tip="action.addVideo"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
         <button id="btnNewScript" class="icon-btn" type="button" data-i18n-tip="action.newScript"><i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i></button>
         <button id="btnPlay" class="primary icon-btn" type="button" data-i18n-tip="action.play"><i class="fa-solid fa-play" aria-hidden="true"></i></button>
@@ -312,7 +387,9 @@
   <button id="btnExitCapture" class="exit-capture" type="button" data-i18n="action.showControls">Hiện bảng điều khiển</button>
   <div id="toast" class="toast" hidden></div>
   <div id="hoverTip" class="hover-tip" role="tooltip" hidden></div>
+  <script src="jquery.min.js"></script>
+  <script src="select2.min.js"></script>
   <script src="sweetalert2.all.min.js"></script>
-  <script src="studio.js?v=34"></script>
+  <script src="studio.js?v=56"></script>
 </body>
 </html>

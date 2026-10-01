@@ -35,7 +35,7 @@ const I18N = {
     "action.down": "Xuống",
     "stage.region": "Vùng phát",
     "stage.emptyTitle": "Sân khấu trống",
-    "stage.emptyBody": "Thêm video, gắn vào từng cảnh, rồi phát liên tiếp hoặc theo mốc vào/ra.",
+    "stage.emptyBody": "Cảnh 1 là video nền. Video khác chỉ phát khi có luật tương tác, hoặc khi chọn video rồi bấm phát.",
     "library.title": "Thư viện video",
     "library.count": "Thư viện · {n}",
     "library.empty": "Chưa có video trong thư viện.",
@@ -50,8 +50,8 @@ const I18N = {
     "script.mode": "Chế độ phát",
     "script.continuous": "Phát liên tiếp",
     "script.segments": "Phát theo đoạn",
-    "script.helpContinuous": "Phát hết từng video theo thứ tự cảnh, rồi chuyển cảnh sau.",
-    "script.helpSegments": "Chỉ phát từ mốc vào đến mốc ra. Hết đoạn thì chuyển cảnh.",
+    "script.helpContinuous": "Cảnh 1 phát lặp làm nền. Cảnh khác chỉ chạy khi chọn rồi bấm phát, hoặc khi đúng luật tương tác.",
+    "script.helpSegments": "Cảnh 1 lặp từ mốc vào đến mốc ra. Cảnh khác chỉ chạy khi chọn rồi bấm phát, hoặc khi đúng luật tương tác.",
     "script.loop": "Lặp lại",
     "script.live": "Nhãn LIVE",
     "script.fit": "Khung hình",
@@ -67,6 +67,8 @@ const I18N = {
     "script.scene": "Cảnh",
     "script.missing": "(thiếu file)",
     "script.unselected": "(chưa chọn)",
+    "videoSearch.empty": "Không có video khớp",
+    "videoSearch.searching": "Đang tìm…",
     "script.confirmDelete": "Xóa kịch bản \"{name}\"?",
     "script.sample": "Kịch bản mẫu",
     "script.n": "Kịch bản {n}",
@@ -199,19 +201,19 @@ const I18N = {
     "about.title": "Sân khấu cho phiên live của bạn",
     "about.lead": "Dựng kịch bản video trên máy, phủ ngày giờ và tương tác từ phòng live của bạn, rồi đưa khung hình sang TikTok LIVE Studio.",
     "about.step1Title": "Dựng kịch bản",
-    "about.step1": "Thêm video, xếp cảnh, rồi phát liên tiếp hoặc theo mốc vào và ra.",
+    "about.step1": "Thêm video và xếp cảnh. Cảnh 1 phát nền, các cảnh sau chỉ chạy khi được chọn hoặc khi có tương tác.",
     "about.step2Title": "Gắn tương tác",
     "about.step2": "Nghe phòng live. Comment đúng từ khóa hoặc quà trùng tên sẽ phát video đã chọn.",
     "about.step3Title": "Phát trên Studio",
     "about.step3": "Dán link luồng vào LIVE Studio, chọn đúng khổ khung và giữ bật âm thanh.",
     "about.scriptTitle": "Kịch bản",
-    "about.scriptBody": "Phát hết video hoặc chỉ một đoạn. Lặp lại, đổi thứ tự cảnh và xem cảnh đang phát được đánh dấu.",
+    "about.scriptBody": "Cảnh 1 là video nền và lặp lại. Chọn một cảnh khác rồi bấm phát nếu muốn chiếu video đó.",
     "about.textTitle": "Chữ trên hình",
     "about.textBody": "Gắn dòng chữ riêng cho từng cảnh hoặc dùng chung. Ngày, giờ và thứ cập nhật theo thời gian thực.",
     "about.roomTitle": "Phòng live của bạn",
     "about.roomBody": "Đọc comment, quà, người mới vào, lượt thích và số người đang xem từ phòng live công khai của chính bạn.",
     "about.triggerTitle": "Phát theo tương tác",
-    "about.triggerBody": "Một comment chứa từ khóa, hoặc một quà trùng tên, sẽ chen video đã chọn rồi quay lại kịch bản.",
+    "about.triggerBody": "Một comment chứa từ khóa, hoặc một quà trùng tên, sẽ chen video đã chọn rồi quay lại cảnh 1.",
     "about.speechTitle": "Lời cảm ơn",
     "about.speechBody": "Khi có người vào phòng, ứng dụng đọc tên và nói lời cảm ơn đã tham gia phiên live.",
     "about.overlayTitle": "Lớp trên luồng",
@@ -254,7 +256,7 @@ const I18N = {
     "action.down": "Down",
     "stage.region": "Playback",
     "stage.emptyTitle": "Empty stage",
-    "stage.emptyBody": "Add videos, attach them to scenes, then play straight through or between in and out points.",
+    "stage.emptyBody": "Scene 1 is the background video. Other videos play only from an interaction rule, or when you select one and press play.",
     "library.title": "Video library",
     "library.count": "Library · {n}",
     "library.empty": "No videos in the library yet.",
@@ -269,8 +271,8 @@ const I18N = {
     "script.mode": "Playback mode",
     "script.continuous": "Play through",
     "script.segments": "Play segments",
-    "script.helpContinuous": "Play each video in scene order, then move to the next scene.",
-    "script.helpSegments": "Play only from the in point to the out point, then advance.",
+    "script.helpContinuous": "Scene 1 loops as the background. Other scenes play only if you select one and press play, or when an interaction rule matches.",
+    "script.helpSegments": "Scene 1 loops between its in and out points. Other scenes play only if you select one and press play, or when an interaction rule matches.",
     "script.loop": "Loop",
     "script.live": "LIVE badge",
     "script.fit": "Frame",
@@ -286,6 +288,8 @@ const I18N = {
     "script.scene": "Scene",
     "script.missing": "(file missing)",
     "script.unselected": "(not selected)",
+    "videoSearch.empty": "No matching video",
+    "videoSearch.searching": "Searching…",
     "script.confirmDelete": "Delete script \"{name}\"?",
     "script.sample": "Sample script",
     "script.n": "Script {n}",
@@ -418,19 +422,19 @@ const I18N = {
     "about.title": "A stage for your own live",
     "about.lead": "Build a video script on this PC, overlay the live clock and activity from your room, then send the frame to TikTok LIVE Studio.",
     "about.step1Title": "Build the script",
-    "about.step1": "Add videos, order the scenes, then play them straight through or between in and out points.",
+    "about.step1": "Add videos and arrange scenes. Scene 1 stays on as the background. Later scenes play only when selected or when someone interacts.",
     "about.step2Title": "Wire up interaction",
     "about.step2": "Listen to the live room. A comment with your keyword, or a matching gift, plays the video you chose.",
     "about.step3Title": "Play in Studio",
     "about.step3": "Paste the stream link into LIVE Studio, match the frame size, and leave audio on.",
     "about.scriptTitle": "Script",
-    "about.scriptBody": "Play a whole video or just a segment. Loop, reorder scenes, and see the scene that is playing.",
+    "about.scriptBody": "Scene 1 is the background and loops. Select another scene and press play to show that video.",
     "about.textTitle": "Text on the picture",
     "about.textBody": "Add text for one scene or for every scene. The date, time, and weekday stay current.",
     "about.roomTitle": "Your live room",
     "about.roomBody": "Read comments, gifts, new viewers, likes, and the viewer count from your own public live room.",
     "about.triggerTitle": "Play from interaction",
-    "about.triggerBody": "A comment that contains a keyword, or a gift with the matching name, cuts in the chosen video and then returns to the script.",
+    "about.triggerBody": "A comment that contains a keyword, or a gift with the matching name, cuts in the chosen video and then returns to scene 1.",
     "about.speechTitle": "Thank-you",
     "about.speechBody": "When someone joins, the app says their name and thanks them for joining the live.",
     "about.overlayTitle": "On the stream",
@@ -1239,6 +1243,196 @@ function onHost(raw) {
     setViewerCount(message.count);
   } else if (message.type === "likes") {
     onLikes(message);
+  } else if (message.type === "license") {
+    renderLicense(message);
+  }
+}
+
+const fallbackPlans = [
+  { code: "free", name: "Free", detail: "Dùng thử 1 giờ trên máy này.", priceVnd: 0 },
+  { code: "pro", name: "Pro", detail: "390.000đ / tháng.", priceVnd: 390000 },
+  { code: "vip", name: "VIP", detail: "490.000đ / tháng.", priceVnd: 490000 }
+];
+let licensePlan = "free";
+let licenseExpiryTimer = 0;
+let licenseWatch = null;
+
+function licenseMoney(value) {
+  const amount = Number(value) || 0;
+  return amount ? `${amount.toLocaleString("vi-VN")}đ / tháng` : "Miễn phí · 1 giờ";
+}
+
+function showLicensePanel(screen) {
+  const plans = document.getElementById("licensePlans");
+  const submit = document.getElementById("licenseSubmit");
+  const pay = document.getElementById("licensePay");
+  const expired = document.getElementById("licenseExpired");
+  const title = document.getElementById("licenseTitle");
+  if (plans) plans.hidden = screen !== "plans";
+  if (submit) submit.hidden = screen !== "plans";
+  if (pay) pay.hidden = screen !== "pay";
+  if (expired) expired.hidden = screen !== "expired";
+  if (title) {
+    title.hidden = screen === "expired";
+    if (screen !== "expired") title.textContent = screen === "pay" ? "Thanh toán" : "Chọn gói";
+  }
+}
+
+function planLabel(code) {
+  if (code === "vip") return "VIP";
+  if (code === "pro") return "Pro";
+  if (code === "free") return "Free";
+  return code ? String(code) : "—";
+}
+
+function licenseInstant(value) {
+  if (!value) return NaN;
+  const text = String(value).trim();
+  const normalized = /(?:z|[+-]\d{2}:?\d{2})$/i.test(text) ? text : `${text}Z`;
+  return new Date(normalized).getTime();
+}
+
+function formatRemain(endsAt) {
+  const ms = licenseInstant(endsAt) - Date.now();
+  if (!Number.isFinite(ms)) return "Đang hoạt động";
+  if (ms <= 0) return "Đã hết hạn";
+  const days = Math.floor(ms / 86400000);
+  if (days >= 1) return `Còn ${days} ngày`;
+  const hours = Math.floor(ms / 3600000);
+  if (hours >= 1) return `Còn ${hours} giờ`;
+  const minutes = Math.floor(ms / 60000);
+  if (minutes >= 1) return `Còn ${minutes} phút`;
+  return `Còn ${Math.max(1, Math.floor(ms / 1000))} giây`;
+}
+
+function paintBrandPlan() {
+  const el = document.getElementById("brandPlan");
+  if (!el || outputMode) return;
+  const plan = licenseWatch?.plan;
+  const next = plan ? planLabel(plan) : "";
+  if (el.textContent !== next) el.textContent = next;
+}
+
+function paintLicenseDock() {
+  paintBrandPlan();
+  const dock = document.getElementById("licenseDock");
+  if (!dock || outputMode) return;
+  const watch = licenseWatch;
+  if (!watch?.allowed || !watch.licenseKey) {
+    dock.hidden = true;
+    return;
+  }
+  dock.hidden = false;
+  const next = `${watch.licenseKey} - ${formatRemain(watch.endsAt)}`;
+  if (dock.textContent !== next) dock.textContent = next;
+}
+
+let licenseExpiryNoted = false;
+let licenseChoosing = false;
+
+function setExpireStatus(text) {
+  const status = document.getElementById("expireStatus");
+  if (!status) return;
+  status.textContent = text || "";
+  status.hidden = !text;
+}
+
+function applyPlanTheme(message) {
+  const vip = !outputMode && message?.allowed && message?.plan === "vip" && message?.screen === "app";
+  if (vip) document.documentElement.dataset.plan = "vip";
+  else delete document.documentElement.dataset.plan;
+}
+
+function lockExpiredLicense() {
+  if (outputMode || licenseExpiryNoted) return;
+  licenseExpiryNoted = true;
+  try { stopPlayback(); } catch (e) {}
+  if (window.Swal?.isVisible()) Swal.close();
+  delete document.documentElement.dataset.plan;
+  document.documentElement.classList.add("needs-license");
+  document.documentElement.classList.remove("license-ok");
+  showLicensePanel("expired");
+  const note = document.getElementById("licenseMessage");
+  if (note) note.textContent = "Key này đã hết hạn trên máy hiện tại.";
+  post({ type: "licenseRefresh" });
+}
+
+function watchLicenseClock() {
+  if (outputMode || !licenseWatch?.allowed || !licenseWatch.endsAt || licenseExpiryNoted) return;
+  const end = licenseInstant(licenseWatch.endsAt);
+  if (Number.isFinite(end) && end <= Date.now()) lockExpiredLicense();
+}
+
+function armLicenseExpiry(message) {
+  clearTimeout(licenseExpiryTimer);
+  if (!message?.allowed || !message.endsAt) return;
+  const ms = licenseInstant(message.endsAt) - Date.now();
+  const wait = Number.isFinite(ms) ? ms + 500 : 0;
+  licenseExpiryTimer = setTimeout(() => post({ type: "licenseRefresh" }), Math.max(0, Math.min(wait, 2147483647)));
+}
+
+function renderLicense(message) {
+  const plans = Array.isArray(message?.plans) && message.plans.length ? message.plans : fallbackPlans;
+  if (!plans.some((plan) => plan.code === licensePlan)) licensePlan = plans[0].code;
+  const host = document.getElementById("licensePlans");
+  if (host) {
+    host.innerHTML = plans.map((plan) => `
+      <button type="button" class="license-plan ${plan.code === licensePlan ? "is-on" : ""}" data-plan="${esc(plan.code)}">
+        <strong>${esc(plan.name || plan.code)}</strong>
+        <span class="price">${esc(licenseMoney(plan.priceVnd))}</span>
+        <span class="muted">${esc(plan.detail || "")}</span>
+      </button>`).join("");
+  }
+  const key = document.getElementById("licenseKeyValue");
+  if (key && message?.licenseKey) key.textContent = message.licenseKey;
+  const payment = message?.payment;
+  const qr = document.getElementById("licenseQr");
+  if (qr) qr.src = payment?.qrImageUrl || "";
+  const amount = document.getElementById("licensePayAmount");
+  if (amount) amount.textContent = payment ? `${Number(payment.amount || 0).toLocaleString("vi-VN")}đ` : "";
+  const bank = document.getElementById("licensePayBank");
+  if (bank) bank.textContent = payment?.bankName || "";
+  const account = document.getElementById("licensePayAccount");
+  if (account) account.textContent = payment?.accountNumber || "";
+  const name = document.getElementById("licensePayName");
+  if (name) name.textContent = payment?.accountName || "";
+  const ref = document.getElementById("licensePayRef");
+  if (ref) ref.textContent = payment?.reference || "";
+  const status = document.getElementById("licenseStatus");
+  if (status) status.textContent = "";
+  const note = document.getElementById("licenseMessage");
+  const screen = message?.screen || (message?.allowed ? "app" : "plans");
+  const end = licenseInstant(message?.endsAt);
+  const stillValid = !Number.isFinite(end) || end > Date.now();
+  const expiryNote = /hết hạn/i.test(message?.message || "");
+  const paying = screen === "pay" && !!payment;
+  if (licenseChoosing && !paying && (screen === "expired" || message?.status === "het_han") && expiryNote) return;
+  licenseChoosing = false;
+  licenseWatch = message || null;
+  const expiredView = !paying && (screen === "expired" || message?.status === "het_han");
+  if (note) note.textContent = paying && message?.message ? message.message : "";
+  if (expiredView) setExpireStatus(expiryNote ? "" : (message?.message || ""));
+  else setExpireStatus("");
+  showLicensePanel(paying ? "pay" : screen);
+  paintLicenseDock();
+  const root = document.documentElement;
+  const openApp = message?.allowed && screen === "app" && stillValid;
+  applyPlanTheme(openApp ? message : null);
+  if (window.Swal?.isVisible() && !paying && (screen === "expired" || message?.status === "het_han" || (message?.allowed && !stillValid))) Swal.close();
+  if (openApp) {
+    licenseExpiryNoted = false;
+    root.classList.remove("needs-license");
+    root.classList.add("license-ok");
+    armLicenseExpiry(message);
+  } else if (!outputMode && window.chrome?.webview) {
+    clearTimeout(licenseExpiryTimer);
+    root.classList.add("needs-license");
+    root.classList.remove("license-ok");
+    if (!paying && (screen === "expired" || message?.status === "het_han" || (message?.allowed && !stillValid))) {
+      try { stopPlayback(); } catch (e) {}
+      showLicensePanel("expired");
+      licenseExpiryNoted = true;
+    }
   }
 }
 
@@ -1436,6 +1630,45 @@ function videoOptions(selected) {
   return options.join("");
 }
 
+function videoMatcher(params, data) {
+  const term = foldText(params.term || "").trim();
+  if (!term) return data;
+  if (foldText(data.text || "").includes(term)) return data;
+  return null;
+}
+
+function releaseVideoSearch(root) {
+  if (!root || !window.jQuery?.fn?.select2) return;
+  window.jQuery(root).find("select.select2-hidden-accessible").each(function () {
+    window.jQuery(this).select2("destroy");
+  });
+}
+
+function mountVideoSearch(root) {
+  if (!root || !window.jQuery?.fn?.select2) return;
+  window.jQuery(root).find("select[data-field='scene-video'], select[data-field='trigger-video']").each(function () {
+    const box = window.jQuery(this);
+    if (box.hasClass("select2-hidden-accessible")) box.select2("destroy");
+    box.off("change.videoSearch");
+    box.select2({
+      width: "100%",
+      dropdownParent: window.jQuery(document.body),
+      minimumResultsForSearch: 0,
+      matcher: videoMatcher,
+      language: {
+        noResults: () => t("videoSearch.empty"),
+        searching: () => t("videoSearch.searching")
+      }
+    });
+    box.on("change.videoSearch", function () {
+      const field = this.dataset.field;
+      if (!field) return;
+      const skip = applyField(field, this);
+      if (skip !== "skip") persistSoon();
+    });
+  });
+}
+
 function chips(overlays, scope, sceneId) {
   if (!overlays?.length) return `<p class="muted">${esc(t("overlay.none"))}</p>`;
   return `<div class="chips">${overlays.map((overlay) => {
@@ -1516,6 +1749,7 @@ function renderInspector() {
   const host = document.getElementById("inspector");
   const script = currentScript();
   renderSharedText();
+  releaseVideoSearch(host);
   if (!script) {
     host.innerHTML = "";
     return;
@@ -1553,6 +1787,7 @@ function renderInspector() {
         ${overlay && state.selectedOverlayKey?.startsWith("s:") ? overlayForm(overlay) : ""}
       ` : `<p class="muted">${esc(t("overlay.pickScene"))}</p>`}
     </section>`;
+  mountVideoSearch(host);
 }
 
 function overlayAnchor(align) {
@@ -1689,6 +1924,8 @@ function updateTimecode() {
 }
 
 function tickTokens() {
+  watchLicenseClock();
+  paintLicenseDock();
   document.querySelectorAll(".overlay").forEach((el) => {
     const span = el.querySelector("span");
     const next = tokenText(el.dataset.raw || "");
@@ -1861,6 +2098,10 @@ async function deleteSelectedScene() {
 
 function selectScene(id) {
   state.selectedSceneId = id;
+  armedVideo = "";
+  const script = currentScript();
+  const index = script?.scenes.findIndex((scene) => scene.id === id) ?? -1;
+  armedSceneIndex = index > 0 ? index : null;
   if (state.selectedOverlayKey?.startsWith("s:")) state.selectedOverlayKey = null;
   markSceneList();
   renderInspector();
@@ -2005,6 +2246,9 @@ function loadSrc(url) {
 async function previewVideo(index) {
   const video = state.videos[index];
   if (!video) return;
+  const bed = currentScript()?.scenes[0]?.videoFile;
+  armedVideo = video.fileName && video.fileName !== bed ? video.fileName : "";
+  armedSceneIndex = null;
   stopPlayback();
   try {
     player.dataset.file = video.fileName;
@@ -2093,7 +2337,13 @@ async function playFrom(index, hops = 0, ticket = epoch) {
   const url = mediaUrl(scene.videoFile);
   if (!url) {
     state.switching = false;
-    return await playFrom(nextIndex(script, index), hops + 1, ticket);
+    if (playMode === "clip" && index !== 0) {
+      playMode = "bed";
+      return await playFrom(0, 0, ticket);
+    }
+    stopPlayback();
+    toast(t("toast.needScene"), "warning");
+    return;
   }
 
   try {
@@ -2105,7 +2355,12 @@ async function playFrom(index, hops = 0, ticket = epoch) {
     const start = script.mode === "segments" ? Math.max(0, Number(scene.startSec) || 0) : 0;
     if (Number.isFinite(player.duration) && start >= Math.max(0, player.duration - 0.05)) {
       state.switching = false;
-      return await playFrom(nextIndex(script, index), hops + 1, ticket);
+      if (playMode === "clip" && index !== 0) {
+        playMode = "bed";
+        return await playFrom(0, 0, ticket);
+      }
+      stopPlayback();
+      return;
     }
     await seekTo(start);
     showPlaceholder(false);
@@ -2130,12 +2385,82 @@ function beginPlay(index) {
   playFrom(index).finally(() => { navLock = false; });
 }
 
+let playMode = "bed";
+let armedSceneIndex = null;
+let armedVideo = "";
+let clipFile = "";
+let resumeMode = "bed";
+let resumeFile = "";
+
 function startPlayback() {
   const script = currentScript();
   if (!script) return;
-  let index = script.scenes.findIndex((scene) => scene.id === state.selectedSceneId);
-  if (index < 0) index = 0;
-  beginPlay(index);
+  if (armedVideo) {
+    const file = armedVideo;
+    armedVideo = "";
+    armedSceneIndex = null;
+    if (file === script.scenes[0]?.videoFile) {
+      playMode = "bed";
+      beginPlay(0);
+      return;
+    }
+    playMode = "clip";
+    beginFile(file);
+    return;
+  }
+  if (armedSceneIndex > 0) {
+    const index = armedSceneIndex;
+    armedSceneIndex = null;
+    playMode = "clip";
+    beginPlay(index);
+    return;
+  }
+  playMode = "bed";
+  beginPlay(0);
+}
+
+function beginFile(file) {
+  if (navLock) return;
+  navLock = true;
+  clipFile = file;
+  playMode = "clip";
+  playFile(file).finally(() => { navLock = false; });
+}
+
+async function playFile(file, ticket = epoch) {
+  const url = mediaUrl(file);
+  if (!url || ticket !== epoch) {
+    playMode = "bed";
+    if (ticket === epoch) await playFrom(0, 0, ticket);
+    return;
+  }
+  state.sceneIndex = -1;
+  state.playing = true;
+  state.switching = true;
+  setPlayUi();
+  markSceneList();
+  renderOverlays();
+  try {
+    if (player.dataset.file !== file) {
+      player.dataset.file = file;
+      await loadSrc(url);
+    }
+    if (ticket !== epoch) return;
+    await seekTo(0);
+    showPlaceholder(false);
+    await player.play();
+    if (ticket !== epoch) {
+      player.pause();
+      return;
+    }
+  } catch {
+    if (ticket === epoch) {
+      stopPlayback();
+      toast(t("toast.playFail"), "error");
+    }
+  } finally {
+    if (ticket === epoch) state.switching = false;
+  }
 }
 
 function stopPlayback() {
@@ -2145,6 +2470,8 @@ function stopPlayback() {
   triggerQueue.length = 0;
   triggerEndsAt = null;
   resumeAfterTrigger = false;
+  playMode = "bed";
+  clipFile = "";
   state.playing = false;
   state.switching = false;
   player.pause();
@@ -2178,6 +2505,7 @@ function foldText(value) {
 function renderTriggers() {
   const host = document.getElementById("triggerHost");
   if (!host) return;
+  releaseVideoSearch(host);
   const script = currentScript();
   const rules = script?.triggers || [];
   if (!rules.length) {
@@ -2194,6 +2522,7 @@ function renderTriggers() {
       <select data-field="trigger-video" data-id="${esc(rule.id)}">${videoOptions(rule.videoFile)}</select>
       <button type="button" data-action="delete-trigger" data-id="${esc(rule.id)}">${esc(t("action.delete"))}</button>
     </div>`).join("");
+  mountVideoSearch(host);
 }
 
 function addTrigger() {
@@ -2350,13 +2679,17 @@ async function runNextTrigger() {
     renderQueue();
     if (resumeAfterTrigger) {
       resumeAfterTrigger = false;
-      beginPlay(resumeSceneIndex);
+      playMode = resumeMode === "clip" ? "clip" : "bed";
+      if (resumeFile) beginFile(resumeFile);
+      else beginPlay(Math.max(0, resumeSceneIndex));
     }
     return;
   }
   if (!triggerPlaying) {
     resumeAfterTrigger = state.playing;
-    resumeSceneIndex = Math.max(0, state.sceneIndex);
+    resumeMode = playMode;
+    resumeSceneIndex = state.sceneIndex;
+    resumeFile = playMode === "clip" && state.sceneIndex < 0 ? (clipFile || player.dataset.file || "") : "";
     epoch += 1;
     state.playing = false;
     state.switching = false;
@@ -2451,29 +2784,24 @@ function setRoomUi(mode, message) {
 function advance() {
   const script = currentScript();
   if (!script || state.switching || navLock) return;
-  const next = nextIndex(script, state.sceneIndex);
-  if (next >= script.scenes.length) {
+  if (playMode === "clip") {
+    playMode = "bed";
+    beginPlay(0);
+    return;
+  }
+  if (!script.loop) {
     stopPlayback();
     return;
   }
-  beginPlay(next);
+  beginPlay(0);
 }
 
 function step(delta) {
   const script = currentScript();
-  if (!script?.scenes.length) return;
-  const base = state.playing
-    ? state.sceneIndex
-    : Math.max(0, script.scenes.findIndex((scene) => scene.id === state.selectedSceneId));
+  if (!script?.scenes.length || state.playing || triggerPlaying) return;
+  const base = Math.max(0, script.scenes.findIndex((scene) => scene.id === state.selectedSceneId));
   const index = clamp(base + delta, 0, script.scenes.length - 1);
-  state.selectedSceneId = script.scenes[index].id;
-  if (state.playing) beginPlay(index);
-  else {
-    markSceneList();
-    renderInspector();
-    renderOverlays();
-    previewScene(script.scenes[index]);
-  }
+  selectScene(script.scenes[index].id);
 }
 
 function onTime() {
@@ -3111,6 +3439,49 @@ function bindStatic() {
       });
     });
   });
+  document.getElementById("licensePlans")?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-plan]");
+    if (!button) return;
+    licensePlan = button.dataset.plan || "free";
+    document.querySelectorAll(".license-plan").forEach((item) => item.classList.toggle("is-on", item.dataset.plan === licensePlan));
+  });
+  document.getElementById("licenseSubmit")?.addEventListener("click", () => {
+    post({ type: "licenseChoose", plan: licensePlan });
+  });
+  document.getElementById("licenseBack")?.addEventListener("click", () => {
+    post({ type: "licenseBack" });
+  });
+  document.getElementById("licensePay")?.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-copy]");
+    if (!button) return;
+    const id = button.dataset.copy === "account" ? "licensePayAccount" : "licensePayRef";
+    const value = document.getElementById(id)?.textContent?.trim() || "";
+    if (!value) return;
+    try {
+      await navigator.clipboard.writeText(value);
+    } catch {
+      return;
+    }
+    toast(button.dataset.copy === "account" ? "Đã sao chép số tài khoản" : "Đã sao chép nội dung", "success");
+  });
+  document.getElementById("licenseExpired")?.addEventListener("click", (event) => {
+    const button = event.target.closest(".expire-plan");
+    if (!button || licenseChoosing) return;
+    licenseChoosing = true;
+    document.querySelectorAll(".expire-plan").forEach((item) => item.classList.toggle("is-on", item === button));
+    setExpireStatus("Đang tạo mã thanh toán…");
+    post({ type: "licenseChoose", plan: button.dataset.plan });
+  });
+  document.getElementById("licenseCopy")?.addEventListener("click", async () => {
+    const value = document.getElementById("licenseKeyValue")?.textContent?.trim() || "";
+    if (!value || value.includes("…")) return;
+    try {
+      await navigator.clipboard.writeText(value);
+    } catch {
+      return;
+    }
+    toast("Đã sao chép key", "success");
+  });
   document.getElementById("btnPlay").addEventListener("click", togglePlay);
   document.getElementById("btnPlay2").addEventListener("click", togglePlay);
   document.getElementById("btnPrev").addEventListener("click", () => step(-1));
@@ -3149,8 +3520,9 @@ function bindStatic() {
   });
 
   window.addEventListener("keydown", (event) => {
+    if (document.documentElement.classList.contains("needs-license")) return;
     const tag = document.activeElement?.tagName;
-    const typing = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+    const typing = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || !!document.activeElement?.closest?.(".select2-container, .select2-dropdown");
     if (event.key === "Escape") {
       if (typing) document.activeElement.blur();
       else if (state.capture) setCapture(false);
@@ -3179,6 +3551,13 @@ applyTheme();
 if (!outputMode) applyLang();
 bindStatic();
 setInterval(tickTokens, 200);
+
+if (outputMode || !window.chrome?.webview) {
+  document.documentElement.classList.remove("needs-license");
+  document.documentElement.classList.add("license-ok");
+} else {
+  renderLicense(null);
+}
 
 if (outputMode) {
   document.body.classList.add("output");

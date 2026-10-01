@@ -17,7 +17,7 @@ public sealed class StudioStore
 		".mp4", ".webm", ".mov", ".m4v", ".mkv"
 	};
 
-	static readonly string[] WebFiles = ["index.html", "studio.css", "studio.js", "sweetalert2.all.min.js", "fontawesome.min.css", "fa-solid-900.woff2"];
+	static readonly string[] WebFiles = ["index.html", "studio.css", "studio.js", "jquery.min.js", "select2.min.js", "select2.min.css", "sweetalert2.all.min.js", "fontawesome.min.css", "fa-solid-900.woff2"];
 
 	public string HostDirectory { get; }
 	public string MediaDirectory { get; }

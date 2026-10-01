@@ -8,6 +8,7 @@ namespace TikTokLivePro;
 public partial class MainPage : ContentPage
 {
 	readonly StudioStore _store = new();
+	readonly LicenseService _license = new();
 	readonly LiveStreamService _live = new();
 	readonly LiveRoomService _room = new();
 	readonly SemaphoreSlim _gate = new(1, 1);
@@ -41,6 +42,8 @@ public partial class MainPage : ContentPage
 			amount = viewerEvent.Amount
 		});
 		_initTask = InitializeStoreAsync();
+		_ = PublishLicenseAsync();
+		_ = WatchLicenseAsync();
 		StudioView.HandlerChanged += (_, _) => _ = AttachAsync();
 	}
 
@@ -153,6 +156,11 @@ public partial class MainPage : ContentPage
 		{
 			using var doc = JsonDocument.Parse(json);
 			var type = doc.RootElement.TryGetProperty("type", out var typeElement) ? typeElement.GetString() : null;
+			if (type is "licenseChoose" or "licenseRefresh" or "licenseBack")
+			{
+				_ = HandleLicenseAsync(type, json);
+				return;
+			}
 			if (type == "pickVideos")
 			{
 				_ = PickVideosAsync();
@@ -196,6 +204,7 @@ public partial class MainPage : ContentPage
 			{
 				case "ready":
 					PostState();
+					_ = PublishLicenseAsync();
 					break;
 				case "deleteVideo":
 					DeleteVideo(root);
@@ -477,6 +486,93 @@ public partial class MainPage : ContentPage
 			Width = Num("width"),
 			Height = Num("height"),
 			Scale = Num("scale")
+		};
+	}
+
+	async Task WatchLicenseAsync()
+	{
+		while (true)
+		{
+			await Task.Delay(_license.WatchDelay);
+			if (_core is null)
+				continue;
+			var snapshot = await _license.GetLicenseAsync();
+			if (!snapshot.Offline)
+				PostLicense(snapshot);
+		}
+	}
+
+	async Task PublishLicenseAsync()
+	{
+		var snapshot = await _license.SyncDeviceAsync();
+		PostLicense(snapshot);
+	}
+
+	async Task HandleLicenseAsync(string type, string json)
+	{
+		try
+		{
+			using var doc = JsonDocument.Parse(json);
+			var root = doc.RootElement;
+			string Text(string name) => root.TryGetProperty(name, out var value) ? value.GetString() ?? "" : "";
+			var snapshot = type == "licenseChoose"
+				? await _license.ChoosePlanAsync(Text("plan"))
+				: type == "licenseBack"
+					? await _license.CancelPaymentAsync()
+					: await _license.GetLicenseAsync();
+			PostLicense(snapshot);
+		}
+		catch (Exception ex)
+		{
+			Post(new { type = "license", success = false, allowed = false, status = "chua_kich_hoat", message = ex.Message, plans = Array.Empty<object>() });
+		}
+	}
+
+	void PostLicense(LicenseSnapshot snapshot)
+	{
+		Post(new
+		{
+			type = "license",
+			success = snapshot.Success,
+			allowed = snapshot.Allowed,
+			message = snapshot.Message,
+			email = snapshot.Email,
+			fullName = snapshot.FullName,
+			status = snapshot.Status,
+			plan = snapshot.Plan,
+			endsAt = AsUtc(snapshot.EndsAt),
+			licenseKey = snapshot.LicenseKey ?? _license.LicenseKey,
+			screen = string.IsNullOrWhiteSpace(snapshot.Screen) ? "plans" : snapshot.Screen,
+			payment = snapshot.Payment == null ? null : new
+			{
+				amount = snapshot.Payment.Amount,
+				qrImageUrl = snapshot.Payment.QrImageUrl,
+				bankName = snapshot.Payment.BankName,
+				accountNumber = snapshot.Payment.AccountNumber,
+				accountName = snapshot.Payment.AccountName,
+				reference = snapshot.Payment.Reference,
+				expiresAt = AsUtc(snapshot.Payment.ExpiresAt)
+			},
+			plans = (snapshot.Plans ?? []).Select(plan => new
+			{
+				code = plan.Code,
+				name = plan.Name,
+				detail = plan.Detail,
+				priceVnd = plan.PriceVnd,
+				activatesImmediately = plan.ActivatesImmediately
+			})
+		});
+	}
+
+	static DateTime? AsUtc(DateTime? value)
+	{
+		if (value == null)
+			return null;
+		return value.Value.Kind switch
+		{
+			DateTimeKind.Utc => value,
+			DateTimeKind.Local => value.Value.ToUniversalTime(),
+			_ => DateTime.SpecifyKind(value.Value, DateTimeKind.Utc)
 		};
 	}
 

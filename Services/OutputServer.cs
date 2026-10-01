@@ -121,6 +121,24 @@ public sealed class OutputServer : IDisposable
 				return;
 			}
 
+			if (path.Equals("/jquery.min.js", StringComparison.OrdinalIgnoreCase))
+			{
+				await SendFileAsync(response, Path.Combine(_root, "jquery.min.js"), "text/javascript; charset=utf-8", context.Request);
+				return;
+			}
+
+			if (path.Equals("/select2.min.js", StringComparison.OrdinalIgnoreCase))
+			{
+				await SendFileAsync(response, Path.Combine(_root, "select2.min.js"), "text/javascript; charset=utf-8", context.Request);
+				return;
+			}
+
+			if (path.Equals("/select2.min.css", StringComparison.OrdinalIgnoreCase))
+			{
+				await SendFileAsync(response, Path.Combine(_root, "select2.min.css"), "text/css; charset=utf-8", context.Request);
+				return;
+			}
+
 			if (path.Equals("/sweetalert2.all.min.js", StringComparison.OrdinalIgnoreCase))
 			{
 				await SendFileAsync(response, Path.Combine(_root, "sweetalert2.all.min.js"), "text/javascript; charset=utf-8", context.Request);
