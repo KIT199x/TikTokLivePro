@@ -19,7 +19,7 @@
   </script>
     <link rel="stylesheet" href="fontawesome.min.css" />
     <link rel="stylesheet" href="select2.min.css" />
-    <link rel="stylesheet" href="studio.css?v=56" />
+    <link rel="stylesheet" href="studio.css?v=63" />
 </head>
 <body data-tab="stage">
   <section id="licenseGate" class="license-gate" aria-label="Bản quyền">
@@ -223,6 +223,63 @@
             <button type="button" class="icon-btn" data-action="add-trigger" data-i18n-tip="trigger.add"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
             <p class="muted" data-i18n="room.hint">Comment có từ khóa, hoặc quà trùng tên, sẽ phát video đã chọn. Người mới vào phòng được đọc tên và cảm ơn bằng tiếng nói.</p>
           </section>
+          <section class="live-box voice-box" id="voiceBox">
+            <h3 data-i18n="voice.title">Giọng đọc</h3>
+            <label class="checks"><input id="voiceGreet" type="checkbox" checked /><span data-i18n="voice.greet">Cảm ơn người vào phòng</span></label>
+            <label class="checks"><input id="voiceRead" type="checkbox" /><span data-i18n="voice.read">Đọc bình luận</span></label>
+            <div class="voice-sub" id="voiceReadOptions">
+              <label class="field"><span data-i18n="voice.readTemplate">Câu đọc ({name}, {comment})</span>
+                <input id="voiceReadTemplate" maxlength="200" spellcheck="false" />
+              </label>
+            </div>
+            <label class="checks"><input id="voiceReply" type="checkbox" /><span data-i18n="voice.reply">Trả lời bình luận</span></label>
+            <div class="voice-sub" id="voiceReplyOptions">
+              <label class="checks"><input id="voiceQuestions" type="checkbox" checked /><span data-i18n="voice.questions">Chỉ trả lời câu hỏi</span></label>
+              <div class="grid2">
+                <label class="field"><span data-i18n="voice.cooldown">Giãn cách (giây)</span>
+                  <input id="voiceCooldown" type="number" min="0" max="120" step="1" value="5" />
+                </label>
+                <label class="field"><span data-i18n="voice.replyTemplate">Câu trả lời ({name}, {reply})</span>
+                  <input id="voiceReplyTemplate" maxlength="200" spellcheck="false" />
+                </label>
+              </div>
+              <label class="field"><span data-i18n="voice.rules">Từ khóa trả lời, mỗi dòng: từ khóa, từ khóa = câu trả lời</span>
+                <textarea id="voiceRules" rows="4" spellcheck="false" placeholder="giá, bao nhiêu = Sản phẩm đang giảm còn 199 nghìn ạ"></textarea>
+              </label>
+              <label class="checks"><input id="voiceAi" type="checkbox" /><span data-i18n="voice.ai">Dùng AI khi không khớp từ khóa</span></label>
+              <div class="voice-sub" id="voiceAiOptions">
+                <div class="grid2">
+                  <label class="field"><span data-i18n="voice.provider">Nhà cung cấp</span>
+                    <select id="voiceProvider">
+                      <option value="https://api.openai.com/v1|gpt-4o-mini">OpenAI</option>
+                      <option value="https://generativelanguage.googleapis.com/v1beta/openai|gemini-2.0-flash">Gemini</option>
+                      <option value="https://api.groq.com/openai/v1|llama-3.1-8b-instant">Groq</option>
+                      <option value="https://api.deepseek.com/v1|deepseek-chat">DeepSeek</option>
+                      <option value="https://openrouter.ai/api/v1|openai/gpt-4o-mini">OpenRouter</option>
+                      <option value="custom" data-i18n="voice.custom">Tùy chỉnh</option>
+                    </select>
+                  </label>
+                  <label class="field"><span data-i18n="voice.model">Model</span>
+                    <input id="voiceModel" maxlength="100" spellcheck="false" />
+                  </label>
+                  <label class="field span2"><span>Base URL</span>
+                    <input id="voiceBaseUrl" maxlength="300" spellcheck="false" />
+                  </label>
+                  <label class="field span2"><span>API key</span>
+                    <input id="voiceKey" type="password" autocomplete="off" spellcheck="false" data-i18n-placeholder="voice.keyPlaceholder" placeholder="Dán API key" />
+                  </label>
+                </div>
+                <label class="field"><span data-i18n="voice.persona">Vai trò của AI</span>
+                  <textarea id="voicePersona" rows="3" maxlength="2000"></textarea>
+                </label>
+                <label class="field"><span data-i18n="voice.knowledge">Thông tin sản phẩm, giá, chính sách</span>
+                  <textarea id="voiceKnowledge" rows="4" maxlength="6000"></textarea>
+                </label>
+              </div>
+            </div>
+            <button id="btnVoiceTest" class="icon-btn" type="button" data-i18n-tip="voice.test"><i class="fa-solid fa-volume-high" aria-hidden="true"></i></button>
+            <p id="voiceStatus" class="muted" data-i18n="voice.hint">Giọng đọc tiếng Việt, phát cả trên app và trên luồng stream.</p>
+          </section>
         </section>
         <section data-view="stream">
           <section class="live-box" id="linkBox">
@@ -233,6 +290,7 @@
               <button id="btnCopyLink" class="icon-btn" type="button" data-i18n-tip="action.copy"><i class="fa-solid fa-copy" aria-hidden="true"></i></button>
             </div>
             <p id="outputLinkStatus" class="muted" data-i18n="stream.openingStatus">Đang mở cổng phát…</p>
+            <p id="outputViewStatus" class="foot"></p>
           </section>
         </section>
       </aside>
@@ -380,6 +438,17 @@
             <p data-i18n="about.studioBody">Menu Luồng có địa chỉ để thêm nguồn liên kết. Bật độ phân giải tùy chỉnh đúng khổ đã chọn: 1080×1920, 1920×1080 hoặc 1080×1080.</p>
           </div>
         </section>
+        <section class="about-note update-note" id="updateBox">
+          <i class="fa-solid fa-cloud-arrow-down" aria-hidden="true"></i>
+          <div>
+            <h3><span data-i18n="update.title">Phiên bản</span> <span id="appVersion">—</span></h3>
+            <p id="updateStatus">Ứng dụng tự kiểm tra bản mới khi mở và mỗi 3 giờ.</p>
+            <div class="update-actions">
+              <button type="button" id="btnCheckUpdate" data-i18n="update.check">Kiểm tra cập nhật</button>
+              <button type="button" class="primary" id="btnInstallUpdate" hidden data-i18n="update.install">Cập nhật và khởi động lại</button>
+            </div>
+          </div>
+        </section>
         <p class="about-fine" data-i18n="about.fine">Ứng dụng chỉ đọc phòng live công khai của bạn để hiện tương tác thật. Không đăng nhập hộ và không tạo comment hay mắt xem giả.</p>
       </article>
     </main>
@@ -390,6 +459,6 @@
   <script src="jquery.min.js"></script>
   <script src="select2.min.js"></script>
   <script src="sweetalert2.all.min.js"></script>
-  <script src="studio.js?v=56"></script>
+  <script src="studio.js?v=63"></script>
 </body>
 </html>

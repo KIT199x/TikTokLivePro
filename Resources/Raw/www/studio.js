@@ -1,5 +1,10 @@
 "use strict";
 
+const STUDIO_BUILD = (() => {
+  try { return new URL(document.currentScript?.src || "", location.href).searchParams.get("v") || ""; }
+  catch { return ""; }
+})();
+
 const I18N = {
   vi: {
     "brand.sub": "Bảng điều khiển",
@@ -146,6 +151,23 @@ const I18N = {
     "stream.opening": "Đang mở cổng…",
     "stream.openingStatus": "Đang mở cổng phát…",
     "stream.ready": "Dán link này vào LIVE Studio. Bật Độ phân giải tùy chỉnh: W {w}, H {h}. Giữ Bật âm thanh.",
+    "stream.viewNone": "Chưa thấy LIVE Studio mở link luồng.",
+    "stream.viewOk": "LIVE Studio đang dựng {w}×{h}, đủ nét.",
+    "stream.viewSmall": "LIVE Studio chỉ dựng {w}×{h} nên hình sẽ mờ. Mở nguồn liên kết, bật Độ phân giải tùy chỉnh và nhập W {fw}, H {fh}.",
+    "update.title": "Phiên bản",
+    "update.idle": "Ứng dụng tự kiểm tra bản mới khi mở và mỗi 3 giờ.",
+    "update.check": "Kiểm tra cập nhật",
+    "update.checking": "Đang kiểm tra bản mới…",
+    "update.latest": "Bạn đang dùng bản mới nhất ({v}).",
+    "update.downloading": "Đang tải bản {v}… {p}%",
+    "update.ready": "Đã tải xong bản {v}. Bấm cập nhật để cài và mở lại app.",
+    "update.installing": "Đang cài bản {v}, app sẽ tự mở lại…",
+    "update.error": "Không cập nhật được: {m}",
+    "update.install": "Cập nhật và khởi động lại",
+    "update.later": "Để sau",
+    "update.askTitle": "Có bản mới {v}",
+    "update.ask": "Bạn đang dùng bản {c}. App sẽ đóng, cài bản {v} rồi tự mở lại. Nếu đang live, hãy cập nhật sau khi tắt live.",
+    "update.askMandatory": "Bản {v} là bản bắt buộc. App sẽ đóng, cài đặt rồi tự mở lại.",
     "settings.title": "Cá nhân hóa",
     "settings.theme": "Nền",
     "settings.dark": "Tối",
@@ -196,6 +218,28 @@ const I18N = {
     "log.chat": "{user}: {text}",
     "speech.thanks": "Cảm ơn {name} đã tham gia phiên live.",
     "speech.thanksGuest": "Cảm ơn bạn đã tham gia phiên live.",
+    "voice.title": "Giọng đọc",
+    "voice.greet": "Cảm ơn người vào phòng",
+    "voice.read": "Đọc bình luận",
+    "voice.readTemplate": "Câu đọc ({name}, {comment})",
+    "voice.reply": "Trả lời bình luận",
+    "voice.questions": "Chỉ trả lời câu hỏi",
+    "voice.cooldown": "Giãn cách (giây)",
+    "voice.replyTemplate": "Câu trả lời ({name}, {reply})",
+    "voice.rules": "Từ khóa trả lời, mỗi dòng: từ khóa, từ khóa = câu trả lời",
+    "voice.ai": "Dùng AI khi không khớp từ khóa",
+    "voice.provider": "Nhà cung cấp",
+    "voice.model": "Model",
+    "voice.custom": "Tùy chỉnh",
+    "voice.keyPlaceholder": "Dán API key",
+    "voice.keySaved": "Đã lưu. Để trống để giữ key cũ",
+    "voice.persona": "Vai trò của AI",
+    "voice.knowledge": "Thông tin sản phẩm, giá, chính sách",
+    "voice.test": "Nghe thử",
+    "voice.testText": "Xin chào, đây là giọng đọc của phiên live.",
+    "voice.hint": "Giọng đọc tiếng Việt, phát cả trên app và trên luồng stream.",
+    "voice.saved": "Đã lưu cấu hình giọng đọc",
+    "voice.aiError": "AI trả lời lỗi: {message}",
     "speech.guestName": "Khán giả",
     "about.kicker": "TikTok Live Pro",
     "about.title": "Sân khấu cho phiên live của bạn",
@@ -367,6 +411,23 @@ const I18N = {
     "stream.opening": "Opening port…",
     "stream.openingStatus": "Opening the stream port…",
     "stream.ready": "Paste this link into LIVE Studio. Turn on custom resolution: W {w}, H {h}. Leave audio on.",
+    "stream.viewNone": "LIVE Studio has not opened the stream link yet.",
+    "stream.viewOk": "LIVE Studio renders {w}×{h}, sharp enough.",
+    "stream.viewSmall": "LIVE Studio renders only {w}×{h}, so the picture is soft. Open the link source, turn on custom resolution and enter W {fw}, H {fh}.",
+    "update.title": "Version",
+    "update.idle": "The app checks for a new version on start and every 3 hours.",
+    "update.check": "Check for updates",
+    "update.checking": "Checking for a new version…",
+    "update.latest": "You are on the latest version ({v}).",
+    "update.downloading": "Downloading {v}… {p}%",
+    "update.ready": "Version {v} is downloaded. Click update to install and restart.",
+    "update.installing": "Installing {v}, the app will reopen…",
+    "update.error": "Update failed: {m}",
+    "update.install": "Update and restart",
+    "update.later": "Later",
+    "update.askTitle": "Version {v} is available",
+    "update.ask": "You are on {c}. The app will close, install {v} and reopen. If you are live, update after the stream ends.",
+    "update.askMandatory": "Version {v} is required. The app will close, install it and reopen.",
     "settings.title": "Personalization",
     "settings.theme": "Appearance",
     "settings.dark": "Dark",
@@ -417,6 +478,28 @@ const I18N = {
     "log.chat": "{user}: {text}",
     "speech.thanks": "Thank you {name} for joining the live.",
     "speech.thanksGuest": "Thank you for joining the live.",
+    "voice.title": "Voice",
+    "voice.greet": "Thank viewers who join",
+    "voice.read": "Read comments aloud",
+    "voice.readTemplate": "Read line ({name}, {comment})",
+    "voice.reply": "Reply to comments",
+    "voice.questions": "Only reply to questions",
+    "voice.cooldown": "Gap (seconds)",
+    "voice.replyTemplate": "Reply line ({name}, {reply})",
+    "voice.rules": "Keyword replies, one per line: keyword, keyword = reply",
+    "voice.ai": "Use AI when no keyword matches",
+    "voice.provider": "Provider",
+    "voice.model": "Model",
+    "voice.custom": "Custom",
+    "voice.keyPlaceholder": "Paste API key",
+    "voice.keySaved": "Saved. Leave empty to keep it",
+    "voice.persona": "AI role",
+    "voice.knowledge": "Products, prices, policies",
+    "voice.test": "Test voice",
+    "voice.testText": "Xin chào, đây là giọng đọc của phiên live.",
+    "voice.hint": "Vietnamese voice, played in the app and on the stream.",
+    "voice.saved": "Voice settings saved",
+    "voice.aiError": "AI reply failed: {message}",
     "speech.guestName": "Viewer",
     "about.kicker": "TikTok Live Pro",
     "about.title": "A stage for your own live",
@@ -540,6 +623,7 @@ function applyLang() {
   });
   document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
     if (el.id === "roomKey" && roomHasKey) el.placeholder = t("room.keySaved");
+    else if (el.id === "voiceKey" && voiceHasKey) el.placeholder = t("voice.keySaved");
     else el.placeholder = t(el.dataset.i18nPlaceholder);
   });
   document.querySelectorAll("[data-i18n-tip]").forEach((el) => {
@@ -553,6 +637,7 @@ function applyLang() {
   setRoomUi(roomMode, roomStatusKey);
   renderEventLog();
   applyFrame();
+  paintUpdate();
 }
 
 function frameOf(value) {
@@ -1210,6 +1295,61 @@ async function askConfirm(message) {
   return !!result.isConfirmed;
 }
 
+let appVersion = "";
+let updateState = { state: "idle" };
+let updatePrompted = "";
+
+function paintUpdate() {
+  const status = document.getElementById("updateStatus");
+  const check = document.getElementById("btnCheckUpdate");
+  const install = document.getElementById("btnInstallUpdate");
+  if (!status) return;
+  const s = updateState;
+  const text = {
+    idle: () => t("update.idle"),
+    checking: () => t("update.checking"),
+    latest: () => t("update.latest", { v: appVersion || s.current || "" }),
+    downloading: () => t("update.downloading", { v: s.version, p: s.percent ?? 0 }),
+    ready: () => t("update.ready", { v: s.version }),
+    installing: () => t("update.installing", { v: s.version }),
+    error: () => t("update.error", { m: s.message || "" })
+  }[s.state] || (() => "");
+  status.textContent = text();
+  if (check) check.disabled = s.state === "checking" || s.state === "downloading" || s.state === "installing";
+  if (install) install.hidden = s.state !== "ready";
+}
+
+async function promptUpdate(message) {
+  if (!window.Swal) {
+    if (message.mandatory || confirm(t("update.ask", { v: message.version }))) post({ type: "installUpdate" });
+    return;
+  }
+  const notes = message.notes ? `<pre class="update-notes">${esc(message.notes)}</pre>` : "";
+  const result = await Swal.fire({
+    title: t("update.askTitle", { v: message.version }),
+    html: `<p>${esc(t(message.mandatory ? "update.askMandatory" : "update.ask", { v: message.version, c: message.current || appVersion }))}</p>${notes}`,
+    icon: "info",
+    showCancelButton: !message.mandatory,
+    allowOutsideClick: !message.mandatory,
+    allowEscapeKey: !message.mandatory,
+    confirmButtonText: t("update.install"),
+    cancelButtonText: t("update.later"),
+    heightAuto: false
+  });
+  if (result.isConfirmed || message.mandatory) post({ type: "installUpdate" });
+}
+
+function onUpdate(message) {
+  updateState = message;
+  paintUpdate();
+  if (message.state === "error" && message.manual) toast(t("update.error", { m: message.message || "" }), "error");
+  if (message.state === "latest" && message.manual) toast(t("update.latest", { v: appVersion || message.current || "" }), "success");
+  if (message.state === "ready" && (message.manual || updatePrompted !== message.version)) {
+    updatePrompted = message.version;
+    void promptUpdate(message);
+  }
+}
+
 function onHost(raw) {
   const message = typeof raw === "string" ? JSON.parse(raw) : raw;
   if (!message || typeof message !== "object") return;
@@ -1222,7 +1362,15 @@ function onHost(raw) {
     ensureSelection();
     renderAll();
     applyRoomForm(message.room);
+    applyVoiceForm(message.voice, message.hasAiKey);
     applyOutputLink(message.outputUrl);
+    if (message.appVersion) {
+      appVersion = message.appVersion;
+      const label = document.getElementById("appVersion");
+      if (label) label.textContent = appVersion;
+    }
+  } else if (message.type === "update") {
+    onUpdate(message);
   } else if (message.type === "videos") {
     state.videos = message.videos || [];
     renderLibrary();
@@ -1245,6 +1393,10 @@ function onHost(raw) {
     onLikes(message);
   } else if (message.type === "license") {
     renderLicense(message);
+  } else if (message.type === "voice") {
+    applyVoiceForm(message.voice, message.hasAiKey);
+  } else if (message.type === "aiReply") {
+    onAiReply(message);
   }
 }
 
@@ -1383,6 +1535,11 @@ function renderLicense(message) {
         <span class="muted">${esc(plan.detail || "")}</span>
       </button>`).join("");
   }
+  document.querySelectorAll(".expire-plan").forEach((button) => {
+    const plan = plans.find((item) => item.code === button.dataset.plan);
+    const price = button.querySelector("strong");
+    if (plan && price) price.textContent = `${Number(plan.priceVnd || 0).toLocaleString("vi-VN")}đ`;
+  });
   const key = document.getElementById("licenseKeyValue");
   if (key && message?.licenseKey) key.textContent = message.licenseKey;
   const payment = message?.payment;
@@ -2574,6 +2731,7 @@ function onLiveEvent(event) {
     thankJoin(event.user);
     return;
   }
+  if (event.kind === "comment") handleVoiceComment(event);
   const hit = (script?.triggers || []).find((rule) => ruleMatches(rule, event));
   if (!hit) return;
   if (!hit.videoFile || !mediaUrl(hit.videoFile)) return;
@@ -2607,19 +2765,259 @@ function spokenName(name) {
   return clean;
 }
 
-function speechCode(which) {
-  return (which || lang) === "en" ? "en-US" : "vi-VN";
+function vietnameseVoice() {
+  const voices = window.speechSynthesis?.getVoices?.() || [];
+  return voices.find((voice) => String(voice.lang || "").toLowerCase().startsWith("vi")) || null;
 }
 
-function preferredVoice(which) {
-  const voices = window.speechSynthesis?.getVoices?.() || [];
-  const prefix = (which || lang) === "en" ? "en" : "vi";
-  return voices.find((voice) => String(voice.lang || "").toLowerCase().startsWith(prefix)) || null;
+const QUESTION_WORDS = [
+  "?", "khong", "ko ", "k ", "sao", "bao nhieu", "bao lau", "gia", "o dau", "nao", "gi", "khi nao", "the nao",
+  "co ship", "ship", "con hang", "size", "mau", "tu van", "hoi", "lam sao", "duoc ko", "duoc khong"
+];
+let voiceSettings = {
+  greet: true,
+  readComments: false,
+  readTemplate: "{name} bình luận: {comment}",
+  reply: false,
+  questionsOnly: true,
+  cooldownSec: 5,
+  replyTemplate: "{name} ơi, {reply}",
+  rules: [],
+  aiEnabled: false,
+  aiBaseUrl: "https://api.openai.com/v1",
+  aiModel: "gpt-4o-mini",
+  persona: "",
+  knowledge: ""
+};
+let voiceHasKey = false;
+let voiceSaveTimer = 0;
+let lastReplyAt = 0;
+let aiPending = 0;
+let lastAiErrorAt = 0;
+const aiRequests = new Map();
+const outputSpeech = [];
+let outputSpeaking = false;
+
+function fillVoice(template, vars) {
+  return Object.entries(vars).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, value), String(template || ""));
+}
+
+function enqueueSpeech(text, replaceOldest) {
+  const clean = String(text || "").replace(/\s+/g, " ").trim().slice(0, 400);
+  if (!clean) return false;
+  if (announceQueue.length >= 6) {
+    if (!replaceOldest) return false;
+    announceQueue.shift();
+  }
+  announceQueue.push({ id: uid(), text: clean });
+  renderQueue();
+  pumpAnnounce();
+  return true;
+}
+
+function matchReplyRule(text) {
+  const folded = foldText(text);
+  return (voiceSettings.rules || []).find((rule) =>
+    String(rule.keywords || "")
+      .split(/[,|;]/)
+      .map((key) => foldText(key).trim())
+      .some((key) => key.length >= 2 && folded.includes(key))) || null;
+}
+
+function looksLikeQuestion(text) {
+  const padded = foldText(text).replace(/đ/g, "d") + " ";
+  return QUESTION_WORDS.some((word) => padded.includes(word));
+}
+
+function handleVoiceComment(event) {
+  if (outputMode) return;
+  const text = String(event.text || "").replace(/\s+/g, " ").trim();
+  if (text.length < 2) return;
+  const name = spokenName(event.user) || "bạn";
+  if (voiceSettings.readComments)
+    enqueueSpeech(fillVoice(voiceSettings.readTemplate, { name, comment: text.slice(0, 150) }));
+  if (!voiceSettings.reply) return;
+  const now = Date.now();
+  if (now - lastReplyAt < (Number(voiceSettings.cooldownSec) || 0) * 1000) return;
+  const rule = matchReplyRule(text);
+  if (rule) {
+    lastReplyAt = now;
+    enqueueSpeech(fillVoice(voiceSettings.replyTemplate, { name, reply: String(rule.reply).replaceAll("{name}", name) }));
+    return;
+  }
+  if (!voiceSettings.aiEnabled) return;
+  if (voiceSettings.questionsOnly && !looksLikeQuestion(text)) return;
+  if (aiPending >= 2 || announceQueue.length >= 6) return;
+  lastReplyAt = now;
+  aiPending += 1;
+  const id = uid();
+  aiRequests.set(id, name);
+  post({ type: "aiReply", id, user: event.user || "", text });
+}
+
+function onAiReply(message) {
+  aiPending = Math.max(0, aiPending - 1);
+  const name = aiRequests.get(message.id) || "bạn";
+  aiRequests.delete(message.id);
+  if (message.reply) {
+    enqueueSpeech(fillVoice(voiceSettings.replyTemplate, { name, reply: message.reply }));
+    return;
+  }
+  if (message.error && Date.now() - lastAiErrorAt > 60000) {
+    lastAiErrorAt = Date.now();
+    toast(t("voice.aiError", { message: message.error }), "error");
+  }
+}
+
+function rulesToText(rules) {
+  return (rules || []).map((rule) => `${rule.keywords} = ${rule.reply}`).join("\n");
+}
+
+function textToRules(text) {
+  return String(text || "")
+    .split(/\r?\n/)
+    .map((line) => {
+      const at = line.indexOf("=");
+      if (at < 0) return null;
+      const keywords = line.slice(0, at).trim();
+      const reply = line.slice(at + 1).trim();
+      return keywords && reply ? { keywords, reply } : null;
+    })
+    .filter(Boolean);
+}
+
+function paintVoiceOptions() {
+  const on = (id) => document.getElementById(id)?.checked;
+  const show = (id, visible) => { const el = document.getElementById(id); if (el) el.hidden = !visible; };
+  show("voiceReadOptions", on("voiceRead"));
+  show("voiceReplyOptions", on("voiceReply"));
+  show("voiceAiOptions", on("voiceAi"));
+  const key = document.getElementById("voiceKey");
+  if (key) key.placeholder = voiceHasKey ? t("voice.keySaved") : t("voice.keyPlaceholder");
+}
+
+function applyVoiceForm(voice, hasKey) {
+  if (voice && typeof voice === "object") voiceSettings = { ...voiceSettings, ...voice };
+  if (typeof hasKey === "boolean") voiceHasKey = hasKey;
+  if (outputMode) return;
+  const set = (id, value) => { const el = document.getElementById(id); if (el && document.activeElement !== el) el.value = value ?? ""; };
+  const check = (id, value) => { const el = document.getElementById(id); if (el) el.checked = !!value; };
+  check("voiceGreet", voiceSettings.greet);
+  check("voiceRead", voiceSettings.readComments);
+  set("voiceReadTemplate", voiceSettings.readTemplate);
+  check("voiceReply", voiceSettings.reply);
+  check("voiceQuestions", voiceSettings.questionsOnly);
+  set("voiceCooldown", voiceSettings.cooldownSec);
+  set("voiceReplyTemplate", voiceSettings.replyTemplate);
+  set("voiceRules", rulesToText(voiceSettings.rules));
+  check("voiceAi", voiceSettings.aiEnabled);
+  set("voiceBaseUrl", voiceSettings.aiBaseUrl);
+  set("voiceModel", voiceSettings.aiModel);
+  set("voicePersona", voiceSettings.persona);
+  set("voiceKnowledge", voiceSettings.knowledge);
+  const provider = document.getElementById("voiceProvider");
+  if (provider) {
+    const match = [...provider.options].find((option) => option.value.split("|")[0] === voiceSettings.aiBaseUrl);
+    provider.value = match ? match.value : "custom";
+  }
+  paintVoiceOptions();
+}
+
+function collectVoice() {
+  const value = (id) => document.getElementById(id)?.value ?? "";
+  const on = (id) => !!document.getElementById(id)?.checked;
+  return {
+    greet: on("voiceGreet"),
+    readComments: on("voiceRead"),
+    readTemplate: value("voiceReadTemplate").trim(),
+    reply: on("voiceReply"),
+    questionsOnly: on("voiceQuestions"),
+    cooldownSec: Math.max(0, Math.min(120, Math.round(Number(value("voiceCooldown")) || 0))),
+    replyTemplate: value("voiceReplyTemplate").trim(),
+    rules: textToRules(value("voiceRules")),
+    aiEnabled: on("voiceAi"),
+    aiBaseUrl: value("voiceBaseUrl").trim(),
+    aiModel: value("voiceModel").trim(),
+    persona: value("voicePersona").trim(),
+    knowledge: value("voiceKnowledge").trim()
+  };
+}
+
+function saveVoiceSoon() {
+  paintVoiceOptions();
+  voiceSettings = { ...voiceSettings, ...collectVoice() };
+  clearTimeout(voiceSaveTimer);
+  voiceSaveTimer = setTimeout(() => {
+    const key = document.getElementById("voiceKey");
+    const aiKey = key?.value.trim() || "";
+    post({ type: "saveVoice", voice: collectVoice(), aiKey: aiKey || null });
+    if (aiKey && key) {
+      key.value = "";
+      voiceHasKey = true;
+      paintVoiceOptions();
+    }
+  }, 500);
+}
+
+function bindVoiceForm() {
+  const box = document.getElementById("voiceBox");
+  if (!box) return;
+  box.addEventListener("change", (event) => {
+    if (event.target.id === "voiceProvider") {
+      const [baseUrl, model] = String(event.target.value).split("|");
+      if (event.target.value !== "custom") {
+        document.getElementById("voiceBaseUrl").value = baseUrl;
+        document.getElementById("voiceModel").value = model || "";
+      }
+    }
+    saveVoiceSoon();
+  });
+  box.addEventListener("input", (event) => {
+    if (event.target.matches("textarea, input:not([type=checkbox])")) saveVoiceSoon();
+  });
+  document.getElementById("btnVoiceTest")?.addEventListener("click", () => speakVietnamese(t("voice.testText")));
+}
+
+function pumpOutputSpeech() {
+  if (outputSpeaking || !outputSpeech.length) return;
+  outputSpeaking = true;
+  const text = outputSpeech.shift();
+  let finished = false;
+  const done = () => {
+    if (finished) return;
+    finished = true;
+    outputSpeaking = false;
+    pumpOutputSpeech();
+  };
+  setTimeout(done, Math.min(45000, 8000 + text.length * 120));
+  speakVietnamese(text, done);
+}
+
+function speakVietnamese(text, done) {
+  const finish = typeof done === "function" ? done : () => {};
+  const voice = vietnameseVoice();
+  if (voice && window.speechSynthesis) {
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = "vi-VN";
+    utter.voice = voice;
+    utter.rate = 1;
+    utter.onend = finish;
+    utter.onerror = finish;
+    window.speechSynthesis.speak(utter);
+    return;
+  }
+  const audio = new Audio(`/api/tts?q=${encodeURIComponent(String(text).slice(0, 400))}`);
+  audio.onended = finish;
+  audio.onerror = finish;
+  audio.play().catch(finish);
 }
 
 function thankJoin(name) {
+  if (!voiceSettings.greet) return;
   const who = spokenName(name);
-  const phrase = who ? t("speech.thanks", { name: who }) : t("speech.thanksGuest");
+  const phrase = who
+    ? I18N.vi["speech.thanks"].replaceAll("{name}", who)
+    : I18N.vi["speech.thanksGuest"];
   const now = Date.now();
   if (now - (heardJoins.get(phrase) || 0) < 25000) return;
   heardJoins.set(phrase, now);
@@ -2630,7 +3028,7 @@ function thankJoin(name) {
 }
 
 function pumpAnnounce() {
-  if (announcing || outputMode || !announceQueue.length || !window.speechSynthesis) return;
+  if (announcing || outputMode || !announceQueue.length) return;
   const item = announceQueue[0];
   announcing = true;
   let finished = false;
@@ -2642,29 +3040,19 @@ function pumpAnnounce() {
     renderQueue();
     pumpAnnounce();
   };
-  const utter = new SpeechSynthesisUtterance(item.text);
-  utter.lang = speechCode();
-  utter.rate = 1;
-  const voice = preferredVoice();
-  if (voice) utter.voice = voice;
-  utter.onend = done;
-  utter.onerror = done;
-  setTimeout(done, 12000);
-  window.speechSynthesis.speak(utter);
+  setTimeout(done, Math.min(45000, 8000 + item.text.length * 120));
+  speakVietnamese(item.text, done);
 }
 
-function speakIncoming(list, spokenLang) {
-  if (!outputMode || !window.speechSynthesis) return;
+function speakIncoming(list) {
+  if (!outputMode) return;
   (list || []).forEach((item) => {
     if (!item?.id || !item.text || spokenIds.has(item.id)) return;
     spokenIds.add(item.id);
-    const utter = new SpeechSynthesisUtterance(item.text);
-    utter.lang = speechCode(spokenLang);
-    utter.rate = 1;
-    const voice = preferredVoice(spokenLang);
-    if (voice) utter.voice = voice;
-    window.speechSynthesis.speak(utter);
+    if (outputSpeech.length >= 6) outputSpeech.shift();
+    outputSpeech.push(item.text);
   });
+  pumpOutputSpeech();
 }
 
 async function runNextTrigger() {
@@ -2969,6 +3357,7 @@ function programSnapshot() {
   return {
     file: player.dataset.file || "",
     time: player.currentTime || 0,
+    at: Date.now(),
     playing: !player.paused && !player.ended && !!player.dataset.file,
     fit: script?.fit || "contain",
     badge: !!script?.showLiveBadge,
@@ -2988,7 +3377,8 @@ function programSnapshot() {
     ratio,
     frameWidth: frame.w,
     frameHeight: frame.h,
-    lang
+    lang,
+    build: STUDIO_BUILD
   };
 }
 
@@ -3013,7 +3403,31 @@ function publishProgram() {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(programSnapshot())
-  }).catch(() => {});
+  })
+    .then((response) => response.ok ? response.json() : null)
+    .then((reply) => paintOutputView(reply?.output || null))
+    .catch(() => {});
+}
+
+let outputViewKey = "";
+
+function paintOutputView(view) {
+  const el = document.getElementById("outputViewStatus");
+  if (!el) return;
+  const frame = frameOf(ratio);
+  const key = view ? `${view.w}x${view.h}@${view.dpr}:${frame.w}x${frame.h}:${lang}` : `none:${lang}`;
+  if (key === outputViewKey) return;
+  outputViewKey = key;
+  if (!view) {
+    el.textContent = t("stream.viewNone");
+    el.className = "foot";
+    return;
+  }
+  const w = Math.round(view.w * (view.dpr || 1));
+  const h = Math.round(view.h * (view.dpr || 1));
+  const small = w < frame.w * 0.9 || h < frame.h * 0.9;
+  el.textContent = t(small ? "stream.viewSmall" : "stream.viewOk", { w, h, fw: frame.w, fh: frame.h });
+  el.className = small ? "foot view-warn" : "foot view-ok";
 }
 
 function paintRemoteOverlays(data) {
@@ -3047,8 +3461,8 @@ function fitOutputFrame() {
   const h = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--frame-h")) || 1920;
   if (!(w > 0) || !(h > 0)) return;
   const scale = Math.min(window.innerWidth / w, window.innerHeight / h);
-  const x = (window.innerWidth - w * scale) / 2;
-  const y = (window.innerHeight - h * scale) / 2;
+  const x = Math.round((window.innerWidth - w * scale) / 2);
+  const y = Math.round((window.innerHeight - h * scale) / 2);
   const fitted = Math.abs(scale - 1) > 0.001 || Math.abs(x) > 0.5 || Math.abs(y) > 0.5;
   const key = fitted ? `${w}x${h}:${scale.toFixed(4)}:${x.toFixed(1)}:${y.toFixed(1)}` : "1";
   if (key === outputScaleKey) return;
@@ -3056,16 +3470,19 @@ function fitOutputFrame() {
   shell.style.transform = fitted ? `translate(${x}px, ${y}px) scale(${scale})` : "";
 }
 
-async function followProgram() {
-  if (followBusy) return;
-  let data;
-  try {
-    data = await (await fetch("/api/program", { cache: "no-store" })).json();
-  } catch {
-    return;
-  }
-  if (!data || typeof data !== "object") return;
-  speakIncoming(data.announcements, data.lang);
+let followLookKey = "";
+let followPolling = false;
+
+function outputViewQuery() {
+  const dpr = Math.round((window.devicePixelRatio || 1) * 100) / 100;
+  return `vw=${Math.round(window.innerWidth)}&vh=${Math.round(window.innerHeight)}&dpr=${dpr}`;
+}
+
+function paintFollowLook(data) {
+  const { time, at, playing, file, announcements, likes, queue, ...look } = data;
+  const key = JSON.stringify(look) + `|${window.innerWidth}x${window.innerHeight}`;
+  if (key === followLookKey) return;
+  followLookKey = key;
   document.getElementById("liveBadge").hidden = !data.badge;
   player.style.objectFit = data.fit === "cover" ? "cover" : "contain";
   if (FRAMES[data.ratio])
@@ -3073,10 +3490,42 @@ async function followProgram() {
   fitOutputFrame();
   if (data.commentLayout) widgetLayout.comment = normalizeCommentLayout(data.commentLayout);
   if (data.viewerLayout) widgetLayout.viewer = normalizeViewerLayout(data.viewerLayout);
-  placeWidgets();
   paintRemoteOverlays(data);
   paintCommentFeed(Array.isArray(data.comments) ? data.comments : [], data.showComments !== false);
   paintViewerBadge(data.viewers, data.showViewers !== false);
+}
+
+function syncOutputClock(data) {
+  const age = Number.isFinite(data.at) ? Math.max(0, Math.min(2000, Date.now() - data.at)) / 1000 : 0;
+  const target = data.time + (data.playing ? age : 0);
+  const drift = target - (player.currentTime || 0);
+  if (!data.playing || Math.abs(drift) > 1.2) {
+    if (player.playbackRate !== 1) player.playbackRate = 1;
+    if (Math.abs(drift) > (data.playing ? 1.2 : 0.25)) player.currentTime = Math.max(0, target);
+    return;
+  }
+  const rate = Math.abs(drift) < 0.08 ? 1 : 1 + Math.max(-0.06, Math.min(0.06, drift * 0.15));
+  if (Math.abs(player.playbackRate - rate) > 0.004) player.playbackRate = rate;
+}
+
+async function followProgram() {
+  if (followBusy || followPolling) return;
+  followPolling = true;
+  let data;
+  try {
+    data = await (await fetch(`/api/program?${outputViewQuery()}`, { cache: "no-store" })).json();
+  } catch {
+    return;
+  } finally {
+    followPolling = false;
+  }
+  if (!data || typeof data !== "object") return;
+  if (data.build && STUDIO_BUILD && data.build !== STUDIO_BUILD) {
+    location.reload();
+    return;
+  }
+  speakIncoming(data.announcements);
+  paintFollowLook(data);
   playIncomingLikes(data.likes, data.showLikes !== false || data.randomHearts === true);
   const file = data.file || "";
   if (!file) {
@@ -3091,11 +3540,11 @@ async function followProgram() {
     if (player.dataset.file !== file) {
       followBusy = true;
       player.dataset.file = file;
+      player.playbackRate = 1;
       await loadSrc(`media/${encodeURIComponent(file)}`);
       followBusy = false;
     }
-    if (Number.isFinite(data.time) && Math.abs((player.currentTime || 0) - data.time) > 0.4)
-      player.currentTime = data.time;
+    if (Number.isFinite(data.time)) syncOutputClock(data);
     showPlaceholder(false);
     if (data.playing && player.paused) await player.play();
     if (!data.playing && !player.paused) player.pause();
@@ -3430,6 +3879,9 @@ function bindStatic() {
     }
     toast(t("toast.copied"), "success");
   });
+  bindVoiceForm();
+  document.getElementById("btnCheckUpdate")?.addEventListener("click", () => post({ type: "checkUpdate" }));
+  document.getElementById("btnInstallUpdate")?.addEventListener("click", () => post({ type: "installUpdate" }));
   ["roomUser", "roomKey"].forEach((id) => {
     document.getElementById(id).addEventListener("change", () => {
       post({

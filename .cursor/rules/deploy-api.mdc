@@ -1,0 +1,13 @@
+---
+description: Deploy NgocHuySoftware.Core.API to the server after every API change
+alwaysApply: true
+---
+
+# Deploy API after changes
+
+When code under `D:\Code\WEB\NgocHuySoftware\NgocHuySoftware.Core.API` is changed, deploy it in the same turn. Do not leave the server on the old build.
+
+- SSH to `192.168.1.123` as `kiennb`. Use the existing deploy script at `C:\Users\Admin\AppData\Local\Temp\cursor-ssh-deploy\deploy-tiktoklive.js` and the password the user already supplied for this server. Do not print the password, the Oracle connection string, or other secrets.
+- Upload the changed API files to `/home/kiennb/code/NgocHuySoftware/NgocHuySoftware.Core.API`, then run `docker compose up -d --build webapi`. The container is `ngochuysoftware_api` on port `8080`.
+- Keep the remote TikTok Live payment account settings. Do not rewrite `appsettings.json` unless the change requires it.
+- After the container is listening, verify the endpoint that changed. Do not commit unless the user asks.

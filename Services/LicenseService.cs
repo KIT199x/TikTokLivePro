@@ -35,7 +35,7 @@ public sealed class LicenseService
 			var env = Environment.GetEnvironmentVariable("TIKTOK_LIVE_API");
 			if (!string.IsNullOrWhiteSpace(env))
 				return env.Trim().TrimEnd('/');
-			return "http://localhost:5056";
+			return "https://api.nguyenbakien.net";
 		}
 	}
 

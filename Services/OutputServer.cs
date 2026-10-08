@@ -5,11 +5,15 @@ namespace TikTokLivePro.Services;
 
 public sealed class OutputServer : IDisposable
 {
+	static readonly HttpClient Speech = CreateSpeechClient();
+	readonly Dictionary<string, byte[]> _speechCache = new(StringComparer.Ordinal);
 	readonly HttpListener _listener = new();
 	readonly CancellationTokenSource _cts = new();
 	readonly string _root;
 	readonly string _media;
+	readonly string _apiBase;
 	readonly object _gate = new();
+	OutputView? _view;
 	string _program = """{"file":"","time":0,"playing":false,"fit":"contain","badge":false,"overlays":[],"queue":[],"stageWidth":1080}""";
 
 	public int Port { get; }
@@ -17,22 +21,23 @@ public sealed class OutputServer : IDisposable
 	// LIVE Studio rejects a raw IP. This name resolves to 127.0.0.1 and matches its URL check.
 	public string OutputUrl => $"http://127.0.0.1.nip.io:{Port}/?output=1";
 
-	OutputServer(string root, string media, int port)
+	OutputServer(string root, string media, string apiBase, int port)
 	{
 		_root = root;
 		_media = media;
+		_apiBase = apiBase.TrimEnd('/');
 		Port = port;
 		_listener.Prefixes.Add($"http://127.0.0.1:{port}/");
 	}
 
-	public static OutputServer Start(string root, string media)
+	public static OutputServer Start(string root, string media, string apiBase)
 	{
 		Exception? last = null;
 		for (var port = 8766; port <= 8776; port++)
 		{
 			try
 			{
-				var server = new OutputServer(root, media, port);
+				var server = new OutputServer(root, media, apiBase, port);
 				server._listener.Start();
 				_ = server.LoopAsync(server._cts.Token);
 				return server;
@@ -100,6 +105,12 @@ public sealed class OutputServer : IDisposable
 			if (path.Equals("/api/program", StringComparison.OrdinalIgnoreCase))
 			{
 				await HandleProgramAsync(context);
+				return;
+			}
+
+			if (path.Equals("/api/tts", StringComparison.OrdinalIgnoreCase))
+			{
+				await HandleSpeechAsync(context);
 				return;
 			}
 
@@ -206,10 +217,30 @@ public sealed class OutputServer : IDisposable
 			var body = await reader.ReadToEndAsync();
 			if (body.Length > 262_144)
 				body = body[..262_144];
+			OutputView? view;
 			lock (_gate)
+			{
 				_program = string.IsNullOrWhiteSpace(body) ? _program : body;
-			response.StatusCode = 204;
+				view = _view;
+			}
+			var age = view is null ? double.MaxValue : (DateTime.UtcNow - view.Seen).TotalSeconds;
+			var reply = age < 5
+				? "{\"output\":{\"w\":" + view!.Width + ",\"h\":" + view.Height + ",\"dpr\":" + view.Dpr.ToString(System.Globalization.CultureInfo.InvariantCulture) + "}}"
+				: """{"output":null}""";
+			var replyBytes = Encoding.UTF8.GetBytes(reply);
+			response.ContentType = "application/json; charset=utf-8";
+			response.Headers["Cache-Control"] = "no-store";
+			response.ContentLength64 = replyBytes.Length;
+			await response.OutputStream.WriteAsync(replyBytes);
 			return;
+		}
+
+		var query = context.Request.QueryString;
+		if (int.TryParse(query["vw"], out var vw) && int.TryParse(query["vh"], out var vh) && vw > 0 && vh > 0)
+		{
+			double.TryParse(query["dpr"], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var dpr);
+			lock (_gate)
+				_view = new OutputView(vw, vh, dpr > 0 ? Math.Round(dpr, 2) : 1, DateTime.UtcNow);
 		}
 
 		string json;
@@ -220,6 +251,111 @@ public sealed class OutputServer : IDisposable
 		response.Headers["Cache-Control"] = "no-store";
 		response.ContentLength64 = bytes.Length;
 		await response.OutputStream.WriteAsync(bytes);
+	}
+
+	static HttpClient CreateSpeechClient()
+	{
+		var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+		client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36");
+		return client;
+	}
+
+	async Task HandleSpeechAsync(HttpListenerContext context)
+	{
+		var response = context.Response;
+		var text = (context.Request.QueryString["q"] ?? "").Trim();
+		if (text.Length == 0)
+		{
+			response.StatusCode = 400;
+			return;
+		}
+		if (text.Length > 400)
+			text = text[..400];
+
+		byte[]? audio;
+		lock (_gate)
+			_speechCache.TryGetValue(text, out audio);
+		if (audio is null)
+		{
+			audio = await SpeechFromApiAsync(text) ?? await SpeechFromGoogleAsync(text);
+			if (audio is null)
+			{
+				response.StatusCode = 502;
+				return;
+			}
+			lock (_gate)
+			{
+				if (_speechCache.Count >= 200)
+					_speechCache.Clear();
+				_speechCache[text] = audio;
+			}
+		}
+
+		response.ContentType = "audio/mpeg";
+		response.Headers["Cache-Control"] = "no-store";
+		response.ContentLength64 = audio.Length;
+		await response.OutputStream.WriteAsync(audio);
+	}
+
+	async Task<byte[]?> SpeechFromApiAsync(string text)
+	{
+		if (string.IsNullOrWhiteSpace(_apiBase))
+			return null;
+		try
+		{
+			using var upstream = await Speech.GetAsync($"{_apiBase}/api/tiktoklive/tts?lang=vi&q={Uri.EscapeDataString(text)}");
+			if (!upstream.IsSuccessStatusCode)
+				return null;
+			var audio = await upstream.Content.ReadAsByteArrayAsync();
+			return audio.Length > 0 ? audio : null;
+		}
+		catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+		{
+			return null;
+		}
+	}
+
+	static async Task<byte[]?> SpeechFromGoogleAsync(string text)
+	{
+		try
+		{
+			using var output = new MemoryStream();
+			foreach (var chunk in SpeechChunks(text))
+			{
+				var url = "https://translate.google.com/translate_tts?ie=UTF-8&tl=vi&client=tw-ob&q=" + Uri.EscapeDataString(chunk);
+				using var upstream = await Speech.GetAsync(url);
+				if (!upstream.IsSuccessStatusCode)
+					return null;
+				await upstream.Content.CopyToAsync(output);
+			}
+			return output.ToArray();
+		}
+		catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+		{
+			return null;
+		}
+	}
+
+	sealed record OutputView(int Width, int Height, double Dpr, DateTime Seen);
+
+	static IEnumerable<string> SpeechChunks(string text)
+	{
+		const int limit = 180;
+		var current = new StringBuilder();
+		foreach (var word in text.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+		{
+			var piece = word.Length > limit ? word[..limit] : word;
+			if (current.Length > 0 && current.Length + piece.Length + 1 > limit)
+			{
+				yield return current.ToString();
+				current.Clear();
+			}
+			if (current.Length > 0)
+				current.Append(' ');
+			current.Append(piece);
+		}
+		if (current.Length > 0)
+			yield return current.ToString();
 	}
 
 	static async Task SendFileAsync(HttpListenerResponse response, string path, string contentType, HttpListenerRequest request)

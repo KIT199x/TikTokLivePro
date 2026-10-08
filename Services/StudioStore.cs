@@ -40,6 +40,8 @@ public sealed class StudioStore
 	public int HeartRate { get; private set; } = 20;
 	public WidgetLayout CommentLayout { get; private set; } = WidgetLayout.Comment();
 	public WidgetLayout ViewerLayout { get; private set; } = WidgetLayout.Viewer();
+	public VoiceSettings Voice { get; private set; } = new();
+	public string AiApiKey { get; private set; } = "";
 
 	string StreamSettingsPath => Path.Combine(FileSystem.AppDataDirectory, "stream-settings.json");
 
@@ -226,10 +228,25 @@ public sealed class StudioStore
 		WriteSettings();
 	}
 
+	public void SaveVoice(VoiceSettings voice, string? apiKey, bool clearKey)
+	{
+		voice.Normalize();
+		Voice = voice;
+		WriteSettings();
+		if (clearKey)
+			AiApiKey = "";
+		else if (!string.IsNullOrWhiteSpace(apiKey))
+			AiApiKey = apiKey.Trim();
+		else
+			return;
+		WriteStreamSettings();
+	}
+
 	void WriteSettings()
 	{
 		var json = JsonSerializer.Serialize(new SettingsDto
 		{
+			Voice = Voice,
 			ActiveScriptId = ActiveScriptId,
 			Theme = Theme,
 			Language = Language,
@@ -277,7 +294,8 @@ public sealed class StudioStore
 			Height = StreamHeight,
 			BitrateKbps = StreamBitrateKbps,
 			TikTokUser = TikTokUser,
-			SigningKey = SigningKey
+			SigningKey = SigningKey,
+			AiApiKey = AiApiKey
 		}, JsonOpts);
 		File.WriteAllText(StreamSettingsPath, json);
 	}
@@ -311,6 +329,11 @@ public sealed class StudioStore
 				CommentLayout = WidgetLayout.NormalizeComment(settings.CommentLayout);
 			if (settings?.ViewerLayout is not null)
 				ViewerLayout = WidgetLayout.NormalizeViewer(settings.ViewerLayout);
+			if (settings?.Voice is not null)
+			{
+				settings.Voice.Normalize();
+				Voice = settings.Voice;
+			}
 		}
 		catch (JsonException)
 		{
@@ -342,6 +365,7 @@ public sealed class StudioStore
 				TikTokUser = "";
 			}
 			SigningKey = settings.SigningKey ?? "";
+			AiApiKey = settings.AiApiKey ?? "";
 		}
 		catch (JsonException)
 		{
@@ -501,6 +525,7 @@ public sealed class StudioStore
 		public int? HeartRate { get; set; }
 		public WidgetLayout? CommentLayout { get; set; }
 		public WidgetLayout? ViewerLayout { get; set; }
+		public VoiceSettings? Voice { get; set; }
 	}
 
 	sealed class StreamSettingsDto
@@ -512,6 +537,7 @@ public sealed class StudioStore
 		public int BitrateKbps { get; set; }
 		public string? TikTokUser { get; set; }
 		public string? SigningKey { get; set; }
+		public string? AiApiKey { get; set; }
 	}
 }
 

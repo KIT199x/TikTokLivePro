@@ -1134,6 +1134,26 @@ body.output .stage {
   filter: opacity(0.999);
 }
 
+body.output #player { filter: none; }
+
+.update-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.update-actions [hidden] { display: none; }
+.update-notes {
+  max-height: 180px;
+  overflow: auto;
+  margin: 10px 0 0;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(127, 127, 127, .12);
+  text-align: left;
+  white-space: pre-wrap;
+  font: inherit;
+  font-size: 13px;
+}
+
+.view-warn { color: var(--warn, #e0a03a); font-weight: 600; }
+.view-ok { color: var(--ok); }
+
 #placeholder {
   position: absolute;
   inset: 0;
@@ -1425,6 +1445,8 @@ textarea { min-height: 74px; resize: vertical; }
 }
 
 .live-box h3 { margin: 0; }
+.voice-sub { display: flex; flex-direction: column; gap: 8px; padding-left: 14px; border-left: 2px solid var(--line); }
+.voice-sub[hidden] { display: none; }
 
 .event-log {
   list-style: none;

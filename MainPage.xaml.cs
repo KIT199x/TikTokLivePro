@@ -11,6 +11,10 @@ public partial class MainPage : ContentPage
 	readonly LicenseService _license = new();
 	readonly LiveStreamService _live = new();
 	readonly LiveRoomService _room = new();
+	readonly AiReplyService _ai = new();
+	UpdateService? _updates;
+	bool _updateLoop;
+	int _updateBusy;
 	readonly SemaphoreSlim _gate = new(1, 1);
 	readonly Task _initTask;
 	OutputServer? _output;
@@ -89,7 +93,7 @@ public partial class MainPage : ContentPage
 			Directory.CreateDirectory(userData);
 			var options = new CoreWebView2EnvironmentOptions
 			{
-				AdditionalBrowserArguments = "--disable-direct-composition --disable-gpu-compositing --disable-features=DirectCompositionVideoOverlays"
+				AdditionalBrowserArguments = "--disable-direct-composition --disable-gpu-compositing --disable-features=DirectCompositionVideoOverlays --autoplay-policy=no-user-gesture-required"
 			};
 			var environment = await CoreWebView2Environment.CreateWithOptionsAsync(null, userData, options);
 			await web.EnsureCoreWebView2Async(environment);
@@ -127,7 +131,7 @@ public partial class MainPage : ContentPage
 				StageWindow.Attach(platformWindow);
 			try
 			{
-				_output = OutputServer.Start(_store.HostDirectory, _store.MediaDirectory);
+				_output = OutputServer.Start(_store.HostDirectory, _store.MediaDirectory, _license.ApiBase);
 			}
 			catch (Exception ex)
 			{
@@ -182,6 +186,21 @@ public partial class MainPage : ContentPage
 				_ = HandleRoomAsync(type, json);
 				return;
 			}
+			if (type == "aiReply")
+			{
+				_ = HandleAiReplyAsync(json);
+				return;
+			}
+			if (type == "checkUpdate")
+			{
+				_ = CheckUpdateAsync(true);
+				return;
+			}
+			if (type == "installUpdate")
+			{
+				_ = InstallUpdateAsync();
+				return;
+			}
 		}
 		catch (Exception ex)
 		{
@@ -205,6 +224,11 @@ public partial class MainPage : ContentPage
 				case "ready":
 					PostState();
 					_ = PublishLicenseAsync();
+					if (!_updateLoop)
+					{
+						_updateLoop = true;
+						_ = UpdateLoopAsync();
+					}
 					break;
 				case "deleteVideo":
 					DeleteVideo(root);
@@ -220,6 +244,9 @@ public partial class MainPage : ContentPage
 					break;
 				case "savePrefs":
 					SavePrefs(root);
+					break;
+				case "saveVoice":
+					SaveVoice(root);
 					break;
 			}
 		}
@@ -397,6 +424,44 @@ public partial class MainPage : ContentPage
 		_store.SetActive(id);
 	}
 
+	void SaveVoice(JsonElement root)
+	{
+		var voice = root.TryGetProperty("voice", out var voiceElement) && voiceElement.ValueKind == JsonValueKind.Object
+			? voiceElement.Deserialize<VoiceSettings>(JsonOpts)
+			: null;
+		if (voice is null)
+			return;
+		var apiKey = root.TryGetProperty("aiKey", out var keyElement) && keyElement.ValueKind == JsonValueKind.String ? keyElement.GetString() : null;
+		var clearKey = root.TryGetProperty("clearAiKey", out var clearElement) && clearElement.ValueKind == JsonValueKind.True;
+		_store.SaveVoice(voice, apiKey, clearKey);
+		Post(new { type = "voice", voice = _store.Voice, hasAiKey = !string.IsNullOrWhiteSpace(_store.AiApiKey) });
+	}
+
+	async Task HandleAiReplyAsync(string json)
+	{
+		string id = "";
+		try
+		{
+			using var doc = JsonDocument.Parse(json);
+			var root = doc.RootElement;
+			id = root.TryGetProperty("id", out var idElement) ? idElement.GetString() ?? "" : "";
+			var user = root.TryGetProperty("user", out var userElement) ? userElement.GetString() ?? "" : "";
+			var text = root.TryGetProperty("text", out var textElement) ? textElement.GetString() ?? "" : "";
+			var voice = _store.Voice;
+			if (!voice.Reply || !voice.AiEnabled || string.IsNullOrWhiteSpace(text))
+			{
+				Post(new { type = "aiReply", id, reply = (string?)null });
+				return;
+			}
+			var reply = await _ai.ReplyAsync(voice, _store.AiApiKey, user, text.Length > 300 ? text[..300] : text);
+			Post(new { type = "aiReply", id, reply });
+		}
+		catch (Exception ex)
+		{
+			Post(new { type = "aiReply", id, reply = (string?)null, error = ex.Message });
+		}
+	}
+
 	void SavePrefs(JsonElement root)
 	{
 		var theme = root.TryGetProperty("theme", out var themeElement) ? themeElement.GetString() : null;
@@ -453,6 +518,9 @@ public partial class MainPage : ContentPage
 				running = _room.IsRunning
 			},
 			outputUrl = _output?.OutputUrl ?? "",
+			appVersion = UpdateService.CurrentVersion,
+			voice = _store.Voice,
+			hasAiKey = !string.IsNullOrWhiteSpace(_store.AiApiKey),
 			prefs = new
 			{
 				theme = _store.Theme,
@@ -487,6 +555,85 @@ public partial class MainPage : ContentPage
 			Height = Num("height"),
 			Scale = Num("scale")
 		};
+	}
+
+	async Task UpdateLoopAsync()
+	{
+		await Task.Delay(TimeSpan.FromSeconds(8));
+		while (true)
+		{
+			await CheckUpdateAsync(false);
+			await Task.Delay(TimeSpan.FromHours(3));
+		}
+	}
+
+	async Task CheckUpdateAsync(bool manual)
+	{
+		if (Interlocked.Exchange(ref _updateBusy, 1) == 1)
+			return;
+		try
+		{
+			_updates ??= new UpdateService(_license.ApiBase);
+			if (manual)
+				Post(new { type = "update", state = "checking", current = UpdateService.CurrentVersion });
+			var info = await _updates.CheckAsync();
+			if (info == null)
+			{
+				if (manual)
+					Post(new { type = "update", state = "error", manual, message = "Không kết nối được máy chủ cập nhật." });
+				return;
+			}
+			if (!info.UpdateAvailable)
+			{
+				Post(new { type = "update", state = "latest", manual, current = UpdateService.CurrentVersion });
+				return;
+			}
+
+			Post(new { type = "update", state = "downloading", manual, version = info.Version, percent = 0 });
+			var progress = new Progress<int>(percent =>
+				Post(new { type = "update", state = "downloading", manual, version = info.Version, percent }));
+			await _updates.DownloadAsync(info, progress);
+			Post(new
+			{
+				type = "update",
+				state = "ready",
+				manual,
+				version = info.Version,
+				current = UpdateService.CurrentVersion,
+				notes = info.Notes,
+				mandatory = info.Mandatory
+			});
+		}
+		catch (Exception ex)
+		{
+			Post(new { type = "update", state = "error", manual, message = ex.Message });
+		}
+		finally
+		{
+			Interlocked.Exchange(ref _updateBusy, 0);
+		}
+	}
+
+	async Task InstallUpdateAsync()
+	{
+		try
+		{
+			if (_updates?.ReadyVersion == null)
+				throw new InvalidOperationException("Chưa tải xong bản cập nhật.");
+			Post(new { type = "update", state = "installing", version = _updates.ReadyVersion });
+			_live.Stop();
+			await _room.StopAsync();
+			_updates.InstallAndRestart();
+			await Task.Delay(300);
+			MainThread.BeginInvokeOnMainThread(() => Application.Current?.Quit());
+		}
+		catch (Exception ex)
+		{
+			var message = ex is System.ComponentModel.Win32Exception
+				? "Cần quyền quản trị để cập nhật vào thư mục cài đặt."
+				: ex.Message;
+			Post(new { type = "update", state = "error", manual = true, message });
+		}
 	}
 
 	async Task WatchLicenseAsync()
